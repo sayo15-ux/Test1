@@ -1,0 +1,143 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'io.dexpack.tool'
+    compileSdk 35
+    ndkVersion '27.0.12077973'
+
+    defaultConfig {
+        applicationId 'io.dexpack.tool'
+        minSdk 26
+        targetSdk 35
+        versionCode 21
+        versionName '21.0'
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+        externalNativeBuild {
+            ndkBuild {
+                arguments "NDK_APPLICATION_MK:=${file('src/main/cpp/Application.mk').absolutePath}"
+            }
+        }
+    }
+
+    signingConfigs {
+        development {
+            storeFile file('signing/development.p12')
+            storeType 'PKCS12'
+            storePassword 'android'
+            keyAlias 'dexpack'
+            keyPassword 'android'
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.development
+            jniDebuggable true
+        }
+        release {
+            signingConfig signingConfigs.development
+            minifyEnabled false
+            debuggable false
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/cpp/Android.mk')
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+    buildFeatures {
+        buildConfig true
+    }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+    packaging {
+        jniLibs {
+            useLegacyPackaging false
+        }
+        resources {
+            excludes += ['META-INF/LICENSE*', 'META-INF/NOTICE*', 'META-INF/DEPENDENCIES', 'META-INF/versions/9/OSGI-INF/MANIFEST.MF']
+        }
+    }
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+    }
+}
+
+def shieldAar = project(':shield').layout.buildDirectory.file('outputs/aar/shield-release.aar')
+def shieldOutput = layout.buildDirectory.dir('generated/shield')
+def generateShieldPayloads = tasks.register('generateShieldPayloads') {
+    dependsOn ':shield:assembleRelease'
+    inputs.file(shieldAar)
+    outputs.file(shieldOutput.map { it.file('shield_payloads.cpp') })
+    doLast {
+        File output = shieldOutput.get().asFile
+        output.mkdirs()
+        def archive = new java.util.zip.ZipFile(shieldAar.get().asFile)
+        try {
+            File classes = new File(output, 'classes.jar')
+            archive.getInputStream(archive.getEntry('classes.jar')).withCloseable { classes.bytes = it.bytes }
+            File dex = new File(output, 'dex')
+            delete dex
+            dex.mkdirs()
+            File sdk = android.sdkDirectory
+            javaexec {
+                classpath = files(new File(sdk, 'build-tools/35.0.0/lib/d8.jar'))
+                mainClass = 'com.android.tools.r8.D8'
+                args '--release', '--min-api', '21', '--lib', new File(sdk, 'platforms/android-35/android.jar').absolutePath,
+                        '--output', dex.absolutePath, classes.absolutePath
+            }
+            def payloads = ['shell': new File(dex, 'classes.dex').bytes]
+            ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
+                def entry = archive.getEntry("jni/${abi}/libScKitShieldV1.so")
+                if (entry == null) throw new GradleException("Shield runtime missing: ${abi}")
+                archive.getInputStream(entry).withCloseable { payloads[abi] = it.bytes }
+            }
+            new File(output, 'shield_payloads.cpp').withWriter('UTF-8') { writer ->
+                writer.write('#include "strings.hpp"\n#include <zlib.h>\nnamespace dexpack::payload {\n')
+                payloads.each { name, bytes ->
+                    String id = name.replaceAll('[^A-Za-z0-9_]', '_')
+                    writer.write("static Bytes data_${id}() {\nstatic const char* const chunks[] = {\n")
+                    def buffer = new ByteArrayOutputStream()
+                    new java.util.zip.DeflaterOutputStream(buffer).withCloseable { it.write(bytes) }
+                    byte[] compressed = buffer.toByteArray()
+                    String encoded = java.util.Base64.encoder.encodeToString(compressed)
+                    for (int i = 0; i < encoded.length(); i += 120) {
+                        writer.write('"' + encoded.substring(i, Math.min(i + 120, encoded.length())) + '"\n')
+                        if ((i + 120) % 15360 == 0 || i + 120 >= encoded.length()) writer.write(',\n')
+                    }
+                    writer.write("};\nBytes packed; packed.reserve(${compressed.length});\nfor (const char* chunk : chunks) { auto part = from64(chunk); packed.insert(packed.end(), part.begin(), part.end()); }\nuLongf size = ${bytes.length}; Bytes result(size);\nrequire(uncompress(result.data(), &size, packed.data(), packed.size()) == Z_OK && size == ${bytes.length}, \"Invalid built-in Shield payload.\");\nreturn result;\n}\n")
+                }
+                writer.write('Bytes shell() { return data_shell(); }\nBytes library(const std::string& abi) {\n')
+                ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
+                    writer.write("if (abi == \"${abi}\") return data_${abi.replace('-', '_')}();\n")
+                }
+                writer.write('throw std::runtime_error("Unsupported Shield ABI.");\n}\n}\n')
+            }
+        } finally { archive.close() }
+    }
+}
+
+tasks.configureEach {
+    if (name == 'preBuild' || name.startsWith('configureNdkBuild') || name.startsWith('buildNdkBuild')) {
+        dependsOn generateShieldPayloads
+    }
+}
+
+dependencies {
+    implementation 'com.android.tools.build:apksig:8.9.2'
+    compileOnly 'de.robv.android.xposed:api:82'
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.80'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+}

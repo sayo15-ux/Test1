@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // Xposed API markers are published here, not on Maven Central.
+        maven { url 'https://api.xposed.info/' }
+    }
+}
+rootProject.name = 'DEX Protection'
+include ':app'
+include ':shield'
