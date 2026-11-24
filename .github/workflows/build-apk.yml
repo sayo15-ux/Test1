@@ -51,6 +51,14 @@ jobs:
       - name: Build debug APK
         run: ./gradlew --no-daemon :app:assembleDebug -Dorg.gradle.workers.max=1
 
+      - name: Upload native SigFall libraries
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigfall-native
+          path: |
+            app/build/intermediates/ndkBuild/debug/obj/local/armeabi-v7a/libsigfall.so
+            app/build/intermediates/ndkBuild/debug/obj/local/arm64-v8a/libsigfall.so
+
       - name: Upload debug APK
         if: success()
         uses: actions/upload-artifact@v4

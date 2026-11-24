@@ -13,6 +13,7 @@ final class SignatureKillV4Config {
     private static final String KEY_EMBED_ORIGINAL_APK = "embed_original_apk";
     private static final String KEY_DELEGATE_ORIGINAL_APPLICATION = "delegate_original_application";
     private static final String KEY_DEBUGGABLE = "debuggable";
+    private static final String KEY_CLEAN_ROOM = "clean_room";
 
     boolean pmProxy = true;
     boolean patchSigningInfo = true;
@@ -21,6 +22,7 @@ final class SignatureKillV4Config {
     boolean embedOriginalApk;
     boolean delegateOriginalApplication = true;
     boolean debuggable;
+    boolean cleanRoom;
 
     static SignatureKillV4Config load(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -32,6 +34,7 @@ final class SignatureKillV4Config {
         config.embedOriginalApk = preferences.getBoolean(KEY_EMBED_ORIGINAL_APK, config.embedOriginalApk);
         config.delegateOriginalApplication = preferences.getBoolean(KEY_DELEGATE_ORIGINAL_APPLICATION, config.delegateOriginalApplication);
         config.debuggable = preferences.getBoolean(KEY_DEBUGGABLE, config.debuggable);
+        config.cleanRoom = preferences.getBoolean(KEY_CLEAN_ROOM, config.cleanRoom);
         return config;
     }
 
@@ -44,6 +47,7 @@ final class SignatureKillV4Config {
         editor.putBoolean(KEY_EMBED_ORIGINAL_APK, embedOriginalApk);
         editor.putBoolean(KEY_DELEGATE_ORIGINAL_APPLICATION, delegateOriginalApplication);
         editor.putBoolean(KEY_DEBUGGABLE, debuggable);
+        editor.putBoolean(KEY_CLEAN_ROOM, cleanRoom);
         if (!editor.commit()) throw new IllegalStateException("Cannot save Signature Kill v4 configuration.");
     }
 
@@ -56,6 +60,7 @@ final class SignatureKillV4Config {
         if (embedOriginalApk) flags |= 16;
         if (delegateOriginalApplication) flags |= 32;
         if (debuggable) flags |= 64;
+        if (cleanRoom) flags |= 128;
         return flags;
     }
 }

@@ -56,6 +56,7 @@ final class SignatureKillV4Dialog extends Dialog {
         addToggle(content, "Patch ApplicationInfo paths", config.patchApplicationInfo, "sigKillV4ApplicationInfo", v -> config.patchApplicationInfo = v);
         addToggle(content, "Embed original APK asset", config.embedOriginalApk, "sigKillV4EmbedApk", v -> config.embedOriginalApk = v);
         addToggle(content, "Debuggable manifest flag", config.debuggable, "sigKillV4Debuggable", v -> config.debuggable = v);
+        addToggle(content, "Clean-room DEX + native payload (experimental)", config.cleanRoom, "sigKillV4CleanRoom", v -> config.cleanRoom = v);
 
         LinearLayout actions = Ui.row(c);
         actions.setGravity(Gravity.END);

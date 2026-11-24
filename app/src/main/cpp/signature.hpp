@@ -26,6 +26,7 @@ namespace dexpack {
         bool embedOriginalApk = false;
         bool delegateOriginalApplication = true;
         bool debuggable = false;
+        bool cleanRoom = false;
         uint32_t flags = 0;
     };
     struct SignatureOptions {

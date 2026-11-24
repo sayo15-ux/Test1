@@ -101,6 +101,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_dexpack_tool_NativeEngine_setSignature
         sigKillV4Options.embedOriginalApk = flags & 16;
         sigKillV4Options.delegateOriginalApplication = flags & 32;
         sigKillV4Options.debuggable = flags & 64;
+        sigKillV4Options.cleanRoom = flags & 128;
     }
     catch(const std::exception&e) {
         error(env,e);
