@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'cn.beingyi.sckit.shield1'
+    namespace 'cn.beingyi.fallen.shield1'
     compileSdk 35
     ndkVersion '27.0.12077973'
     defaultConfig {

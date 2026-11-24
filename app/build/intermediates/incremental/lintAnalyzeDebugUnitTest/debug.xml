@@ -1,0 +1,27 @@
+<variant
+    name="debug"
+    package="io.dexpack.tool"
+    minSdkVersion="26"
+    targetSdkVersion="35"
+    debuggable="true"
+    mergedManifest="build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml"
+    partialResultsDir="build/intermediates/unit_test_lint_partial_results/debug/lintAnalyzeDebugUnitTest/out"
+    desugaredMethodsFiles="/root/.gradle/caches/8.11.1/transforms/59a71f3cc77d0af6ed167a3d02da2413/transformed/desugar_jdk_libs_configuration-2.1.5-desugar-lint.txt:/root/.gradle/caches/8.11.1/transforms/43757de466752127a3ee11cb23d40d49/transformed/D8BackportedDesugaredMethods.txt">
+  <buildFeatures
+      coreLibraryDesugaring="true"
+      namespacing="REQUIRED"/>
+  <sourceProviders>
+  </sourceProviders>
+  <testSourceProviders>
+    <sourceProvider
+        manifests="src/test/AndroidManifest.xml"
+        javaDirectories="src/test/java:src/testDebug/java:src/test/kotlin:src/testDebug/kotlin"
+        assetsDirectories="src/test/assets:src/testDebug/assets"
+        unitTest="true"/>
+  </testSourceProviders>
+  <testFixturesSourceProviders>
+  </testFixturesSourceProviders>
+  <artifact
+      type="UNIT_TEST">
+  </artifact>
+</variant>

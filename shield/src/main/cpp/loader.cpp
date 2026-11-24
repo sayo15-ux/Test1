@@ -156,19 +156,19 @@ namespace {
         env->PopLocalFrame(nullptr);
     }
 }
-extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_sckit_shield1_SubApp_prepare(JNIEnv* env, jclass, jobject loader, jstring apk, jstring data) {
+extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_fallen_shield1_SubApp_prepare(JNIEnv* env, jclass, jobject loader, jstring apk, jstring data) {
     invoke(env, [&] { prepare(env, loader, text(env, apk), text(env, data)); });
 }
-extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_sckit_shield1_SubApp_prepareFromRuntime(JNIEnv* env, jclass, jobject loader) {
+extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_fallen_shield1_SubApp_prepareFromRuntime(JNIEnv* env, jclass, jobject loader) {
     invoke(env, [&] {
         for (const auto& entry : prepared) if (env->IsSameObject(loader, entry.loader)) return;
         auto info = get(env, boundApplication(env, activityThread(env)), "appInfo", "Landroid/content/pm/ApplicationInfo;");
         prepareInfo(env, loader, info);
     });
 }
-extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_sckit_shield1_SubApp_attach(JNIEnv* env, jclass, jobject context) {
+extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_fallen_shield1_SubApp_attach(JNIEnv* env, jclass, jobject context) {
     invoke(env, [&] { prepareContext(env, context); });
 }
-extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_sckit_shield1_SubApp_create(JNIEnv* env, jclass, jobject shell) {
+extern "C" JNIEXPORT void JNICALL Java_cn_beingyi_fallen_shield1_SubApp_create(JNIEnv* env, jclass, jobject shell) {
     invoke(env, [&] { createApplication(env, shell); });
 }

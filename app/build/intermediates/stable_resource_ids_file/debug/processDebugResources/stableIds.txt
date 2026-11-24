@@ -1,0 +1,3 @@
+io.dexpack.tool:style/AppTheme = 0x7f030000
+io.dexpack.tool:string/app_name = 0x7f020000
+io.dexpack.tool:drawable/ic_launcher = 0x7f010000

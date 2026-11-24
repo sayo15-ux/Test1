@@ -5,7 +5,7 @@ namespace dexpack::payload {
     Bytes stub() {
         dex::Model model;
         dex::Class marker;
-        marker.type = u"LbyScKit;";
+        marker.type = u"LbyFallen;";
         marker.super = u"Ljava/lang/Object;";
         marker.flags = 0x11;
         model.classes.push_back(marker);

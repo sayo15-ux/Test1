@@ -1506,7 +1506,7 @@ namespace dexpack {
         // instantiateApplication
         Builder ia;
         // ins=3: this=v3, cl=v4, className=v5
-        ia.add(string(0,u"fancybypass.component.FancyApplication"));
+        ia.add(string(0,u"sigfall.component.SigFallApplication"));
         ia.add(moveObject(1,5));
         ia.add(call(stringEquals,0,2,0x74)); ia.add(resultInt(0));
         uint32_t notProxy=uint32_t(ia.instructions.size()); ia.add(raw({uint16_t(0x38|(0<<8)),0}));

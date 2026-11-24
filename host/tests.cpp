@@ -32,7 +32,7 @@ static void crypto() {
     expect(hex(md5(ascii("abc"))) == "900150983cd24fb0d6963f7d28e17f72", "MD5 vector failed");
     auto b = ascii("abc");
     expect(hex(sha1(b.data(), b.size())) == "a9993e364706816aba3e25717850c26c9cd0d89d", "SHA-1 vector failed");
-    expect(encryptString(u"abc", u"ScKit") == u"ScKit-ca824a364a6b162539b5e8c84966f608", "Reference AES vector failed");
+    expect(encryptString(u"abc", u"Fallen") == u"Fallen-ddf7a7bd692d7b807855618457fdc657", "Reference AES vector failed");
     Text t = u"A\0";
     t.push_back(0xd83d);
     t.push_back(0xde42);

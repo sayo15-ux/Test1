@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class io.dexpack.tool.UiFlowTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class io.dexpack.tool.UiFlowTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/io.dexpack.tool.html">io.dexpack.tool</a> &gt; UiFlowTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">12</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">12</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">3.840s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Failed tests</a>
+</li>
+<li>
+<a href="#tab1">Tests</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<div class="test">
+<a name="classSearchAndPartialPackageSelectionAreUsable"></a>
+<h3 class="failures">classSearchAndPartialPackageSelectionAreUsable</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="drawerAndSigningSettingsUseNativeScreens"></a>
+<h3 class="failures">drawerAndSigningSettingsUseNativeScreens</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="drawerOpensRuntimeHookScreen"></a>
+<h3 class="failures">drawerOpensRuntimeHookScreen</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="drawerOpensTestSignatureScreen"></a>
+<h3 class="failures">drawerOpensTestSignatureScreen</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="emptyHomeRendersAndCannotStart"></a>
+<h3 class="failures">emptyHomeRendersAndCannotStart</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="progressAndOutputUseTheExecutorDialog"></a>
+<h3 class="failures">progressAndOutputUseTheExecutorDialog</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="shieldSelectionAndSigningDialogRetainReferenceLayout"></a>
+<h3 class="failures">shieldSelectionAndSigningDialogRetainReferenceLayout</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="signatureKillV2NeedsNoClassSelection"></a>
+<h3 class="failures">signatureKillV2NeedsNoClassSelection</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="signatureKillerNeedsNoClassSelection"></a>
+<h3 class="failures">signatureKillerNeedsNoClassSelection</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="signingModesValidateBeforeConfirming"></a>
+<h3 class="failures">signingModesValidateBeforeConfirming</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="smallScreenRetainsControls"></a>
+<h3 class="failures">smallScreenRetainsControls</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+<div class="test">
+<a name="v1AndV2KeepSeparateSelectionsAndSaveOrCancelCorrectly"></a>
+<h3 class="failures">v1AndV2KeepSeparateSelectionsAndSaveOrCancelCorrectly</h3>
+<span class="code">
+<pre>java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+	at java.base/java.lang.System.loadLibrary(System.java:2006)
+	at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:297)
+	at org.conscrypt.NativeLibraryLoader$1.run(NativeLibraryLoader.java:289)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at org.conscrypt.NativeLibraryLoader.loadLibraryFromHelperClassloader(NativeLibraryLoader.java:289)
+	at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:262)
+	at org.conscrypt.NativeLibraryLoader.load(NativeLibraryLoader.java:162)
+	at org.conscrypt.NativeLibraryLoader.loadFirstAvailable(NativeLibraryLoader.java:106)
+	at org.conscrypt.NativeCryptoJni.init(NativeCryptoJni.java:50)
+	at org.conscrypt.NativeCrypto.&lt;clinit&gt;(NativeCrypto.java:64)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:58)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:51)
+	at org.conscrypt.OpenSSLProvider.&lt;init&gt;(OpenSSLProvider.java:47)
+	at org.robolectric.android.internal.AndroidTestEnvironment.setUpApplicationState(AndroidTestEnvironment.java:163)
+	at org.robolectric.RobolectricTestRunner.beforeTest(RobolectricTestRunner.java:284)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:279)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni-linux-aarch_64 in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt_openjdk_jni in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		... 28 more
+	Suppressed: java.lang.UnsatisfiedLinkError: no conscrypt in java.library.path: /usr/lib/jvm/java-17-openjdk/lib/server:/usr/lib/jvm/java-17-openjdk/lib:/usr/lib/jvm/java-17-openjdk/../lib:/data/app/~~kd2Mw2Wwb4kKnJpzeu9z2A==/com.yugahashimoto.andcode-AaGJWjWfuGlv_DKM5sTN1w==/lib/arm64:/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/workspace/Fallen/app/src/testDebug/jniLibs:/workspace/Fallen/app/src/test/jniLibs
+		at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2434)
+		at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:818)
+		at java.base/java.lang.System.loadLibrary(System.java:2006)
+		at org.conscrypt.NativeLibraryUtil.loadLibrary(NativeLibraryUtil.java:54)
+		at org.conscrypt.NativeLibraryLoader.loadLibraryFromCurrentClassloader(NativeLibraryLoader.java:318)
+		at org.conscrypt.NativeLibraryLoader.loadLibrary(NativeLibraryLoader.java:273)
+		... 15 more
+</pre>
+</span>
+</div>
+</div>
+<div id="tab1" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="failures">classSearchAndPartialPackageSelectionAreUsable</td>
+<td class="failures">0.035s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">drawerAndSigningSettingsUseNativeScreens</td>
+<td class="failures">0.041s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">drawerOpensRuntimeHookScreen</td>
+<td class="failures">0.017s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">drawerOpensTestSignatureScreen</td>
+<td class="failures">0.039s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">emptyHomeRendersAndCannotStart</td>
+<td class="failures">0.035s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">progressAndOutputUseTheExecutorDialog</td>
+<td class="failures">0.041s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">shieldSelectionAndSigningDialogRetainReferenceLayout</td>
+<td class="failures">0.050s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">signatureKillV2NeedsNoClassSelection</td>
+<td class="failures">0.037s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">signatureKillerNeedsNoClassSelection</td>
+<td class="failures">0.030s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">signingModesValidateBeforeConfirming</td>
+<td class="failures">0.045s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">smallScreenRetainsControls</td>
+<td class="failures">3.436s</td>
+<td class="failures">failed</td>
+</tr>
+<tr>
+<td class="failures">v1AndV2KeepSeparateSelectionsAndSaveOrCancelCorrectly</td>
+<td class="failures">0.034s</td>
+<td class="failures">failed</td>
+</tr>
+</table>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.11.1</a> at Nov 24, 2026, 9:36:53 AM</p>
+</div>
+</div>
+</body>
+</html>

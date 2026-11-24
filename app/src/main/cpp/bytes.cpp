@@ -325,7 +325,7 @@ namespace dexpack {
     }
     Text encryptString(const Text& value,const Text& password) {
         auto key=ascii(hex(md5(ascii(utf8(password)))).substr(8,16));
-        return utf16("ScKit-"+hex(aes128(ascii(utf8(value)),key)));
+        return utf16("Fallen-"+hex(aes128(ascii(utf8(value)),key)));
     }
     static uint32_t checksum(const Bytes& b,size_t start) {
         uLong sum=adler32(0L,Z_NULL,0);

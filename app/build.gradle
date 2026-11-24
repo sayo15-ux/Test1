@@ -98,8 +98,8 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
             }
             def payloads = ['shell': new File(dex, 'classes.dex').bytes]
             ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
-                def entry = archive.getEntry("jni/${abi}/libScKitShieldV1.so")
-                if (entry == null && abi == 'x86') entry = archive.getEntry('jni/x86_64/libScKitShieldV1.so')
+                def entry = archive.getEntry("jni/${abi}/libFallenShieldV1.so")
+                if (entry == null && abi == 'x86') entry = archive.getEntry('jni/x86_64/libFallenShieldV1.so')
                 if (entry == null) throw new GradleException("Shield runtime missing: ${abi}")
                 archive.getInputStream(entry).withCloseable { payloads[abi] = it.bytes }
             }
@@ -128,7 +128,7 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
     }
 }
 
-def fancyRefDir = file('src/main/cpp/fancybypass_ref')
+def fancyRefDir = file('src/main/cpp/sigfall_ref')
 def fancyOutput = layout.buildDirectory.dir('generated/fancy')
 def generateFancyPayloads = tasks.register('generateFancyPayloads') {
     inputs.file(new File(fancyRefDir, 'arm.so'))

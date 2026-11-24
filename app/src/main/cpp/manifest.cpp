@@ -1,7 +1,7 @@
 #include "manifest.hpp"
 namespace dexpack {
     static const Text NS=u"http://schemas.android.com/apk/res/android";
-    static const Text APP=u"cn.beingyi.sckit.shield1.SubApp",FACTORY=u"cn.beingyi.sckit.shield1.SubAppComponentFactory";
+    static const Text APP=u"cn.beingyi.fallen.shield1.SubApp",FACTORY=u"cn.beingyi.fallen.shield1.SubAppComponentFactory";
     struct Pool {
         std::vector<Text> strings;
         Bytes styleOffsets,styles;

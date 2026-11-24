@@ -126,7 +126,7 @@ namespace dexpack::shield {
         struct stat lockStat{};
         require(fstat(lock.value, &lockStat) == 0 && S_ISREG(lockStat.st_mode) && lockStat.st_uid == getuid(), "Unsafe Shield cache lock.");
         require(flock(lock.value, LOCK_EX) == 0, "Cannot lock Shield cache.");
-        Archive archive(apk); auto entry = archive.find("assets/ScKit_shield_v1.dex"); require(entry != nullptr, "Shield payload is missing.");
+        Archive archive(apk); auto entry = archive.find("assets/Fallen_shield_v1.dex"); require(entry != nullptr, "Shield payload is missing.");
         Temporary payload(base+"/payload-XXXXXX");
         archive.extractTo(*entry, [&](const uint8_t* p, size_t n) { writeAll(payload.fd, p, n); });
         Mapping mapping(payload.fd, entry->size); auto index = inspect(mapping.data, mapping.size);

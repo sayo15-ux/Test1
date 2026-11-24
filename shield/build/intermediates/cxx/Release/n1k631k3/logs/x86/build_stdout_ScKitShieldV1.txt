@@ -1,0 +1,5 @@
+[x86] Compile++      : ScKitShieldV1 <= loader.cpp
+[x86] Compile++      : ScKitShieldV1 <= payload.cpp
+[x86] Compile++      : ScKitShieldV1 <= archive.cpp
+[x86] Compile++      : ScKitShieldV1 <= bytes.cpp
+[x86] SharedLibrary  : libScKitShieldV1.so

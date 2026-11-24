@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-/** Configuration screen for the FancyBypass-style runtime signature interceptor. */
+/** Configuration screen for the SigFall-style runtime signature interceptor. */
 final class RuntimeHookDialog extends Dialog {
     private static final Pattern PACKAGE_NAME =
             Pattern.compile("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)*$");

@@ -1,0 +1,58 @@
+{
+  "buildFiles": [
+    "/workspace/Fallen/shield/src/main/cpp/Android.mk",
+    "/workspace/Fallen/shield/src/main/cpp/Application.mk"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+      "NDK_PROJECT_PATH\u003dnull",
+      "APP_BUILD_SCRIPT\u003d/workspace/Fallen/shield/src/main/cpp/Android.mk",
+      "NDK_APPLICATION_MK\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+      "APP_ABI\u003darm64-v8a",
+      "NDK_ALL_ABIS\u003darm64-v8a",
+      "NDK_DEBUG\u003d0",
+      "APP_PLATFORM\u003dandroid-21",
+      "NDK_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/obj",
+      "NDK_LIBS_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/lib",
+      "NDK_APPLICATION_MK:\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+    "NDK_PROJECT_PATH\u003dnull",
+    "APP_BUILD_SCRIPT\u003d/workspace/Fallen/shield/src/main/cpp/Android.mk",
+    "NDK_APPLICATION_MK\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+    "APP_ABI\u003darm64-v8a",
+    "NDK_ALL_ABIS\u003darm64-v8a",
+    "NDK_DEBUG\u003d0",
+    "APP_PLATFORM\u003dandroid-21",
+    "NDK_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/obj",
+    "NDK_LIBS_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/lib",
+    "NDK_APPLICATION_MK:\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ScKitShieldV1-release-arm64-v8a": {
+      "artifactName": "ScKitShieldV1",
+      "buildCommandComponents": [
+        "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+        "NDK_PROJECT_PATH\u003dnull",
+        "APP_BUILD_SCRIPT\u003d/workspace/Fallen/shield/src/main/cpp/Android.mk",
+        "NDK_APPLICATION_MK\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+        "APP_ABI\u003darm64-v8a",
+        "NDK_ALL_ABIS\u003darm64-v8a",
+        "NDK_DEBUG\u003d0",
+        "APP_PLATFORM\u003dandroid-21",
+        "NDK_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/obj",
+        "NDK_LIBS_OUT\u003d/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/lib",
+        "NDK_APPLICATION_MK:\u003d/workspace/Fallen/shield/src/main/cpp/Application.mk",
+        "/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/obj/local/arm64-v8a/libScKitShieldV1.so"
+      ],
+      "abi": "arm64-v8a",
+      "output": "/workspace/Fallen/shield/build/intermediates/cxx/Release/n1k631k3/obj/local/arm64-v8a/libScKitShieldV1.so",
+      "runtimeFiles": []
+    }
+  }
+}

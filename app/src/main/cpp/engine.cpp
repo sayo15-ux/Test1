@@ -6,8 +6,8 @@
 #include <cstring>
 #include <thread>
 namespace dexpack {
-    static const std::string ASSET="assets/ScKit_shield_v1.dex";
-    static const std::string SIGV2_ASSET="assets/ScKit_sigkill2_original.apk";
+    static const std::string ASSET="assets/Fallen_shield_v1.dex";
+    static const std::string SIGV2_ASSET="assets/Fallen_sigkill2_original.apk";
     static const std::vector<std::string> ABIS {
         "arm64-v8a","armeabi-v7a","x86_64","x86"
     };
@@ -105,7 +105,7 @@ namespace dexpack {
         }
         for(const auto&abi:ABIS) {
             if(present.empty()||present.count(abi))abis.push_back(abi);
-            require(!archive.find("lib/"+abi+"/libScKitShieldV1.so"),"Protection library name collision.");
+            require(!archive.find("lib/"+abi+"/libFallenShieldV1.so"),"Protection library name collision.");
         }
     }
     std::vector<Text> classes(const Input&input) {
@@ -114,7 +114,7 @@ namespace dexpack {
             auto data=input.archive.extract(name);
             for(const auto&t:dex::classNames(data)) {
                 require(seen.insert(t).second,"This APK defines a class twice.");
-                require(t.rfind(u"Lcn/beingyi/sckit/shield1/",0)!=0,"This APK already contains a shield loader.");
+                require(t.rfind(u"Lcn/beingyi/fallen/shield1/",0)!=0,"This APK already contains a shield loader.");
             }
         }
         return {
@@ -193,7 +193,7 @@ namespace dexpack {
                 shieldManifest(input.manifest),false
             };
             for(const auto&name:input.dexNames)remove.insert(name);
-            for(const auto&abi:input.abis)replacements["lib/"+abi+"/libScKitShieldV1.so"]= {
+            for(const auto&abi:input.abis)replacements["lib/"+abi+"/libFallenShieldV1.so"]= {
                 payload::library(abi),true
             };
             for(const auto&e:input.archive.entries)if(e.name.rfind("lib/",0)==0) {
@@ -357,7 +357,7 @@ namespace dexpack {
             for (auto& c : helperModel.classes)
                 for (auto* g : {&c.direct, &c.virtuals})
                     for (auto& m : *g) if (m->code) m->code->debug.reset();
-            // put helper in its own dex like fancybypass (classes2.dex or next available)
+            // put helper in its own dex like sigfall (classes2.dex or next available)
             std::string helperDex="classes2.dex";
             if (input.archive.find(helperDex) || replacements.count(helperDex)) {
                 for(int i=2;i<999;++i){ std::string n=i==1?"classes.dex":"classes"+std::to_string(i)+".dex"; if(!input.archive.find(n)&&!replacements.count(n)){helperDex=n;break;} }
@@ -396,7 +396,7 @@ namespace dexpack {
             for (auto& c : helperModel.classes)
                 for (auto* g : {&c.direct, &c.virtuals})
                     for (auto& m : *g) if (m->code) m->code->debug.reset();
-            // put helper in its own dex like fancybypass (classes2.dex or next available)
+            // put helper in its own dex like sigfall (classes2.dex or next available)
             std::string helperDex="classes2.dex";
             if (input.archive.find(helperDex) || replacements.count(helperDex)) {
                 for(int i=2;i<999;++i){ std::string n=i==1?"classes.dex":"classes"+std::to_string(i)+".dex"; if(!input.archive.find(n)&&!replacements.count(n)){helperDex=n;break;} }
@@ -411,11 +411,11 @@ namespace dexpack {
             static const std::string SIGV4_ASSET="fancy/origin.apk";
             static const std::string SIGV4_LIB64="fancy/lib/arm64.so";
             static const std::string SIGV4_LIB32="fancy/lib/arm.so";
-            require(!input.archive.find(SIGV4_ASSET),"Fancy bypass asset collision.");
-            require(!input.archive.find(SIGV4_LIB64),"Fancy bypass native library collision.");
-            require(!input.archive.find(SIGV4_LIB32),"Fancy bypass native library collision.");
-            const Text helper=u"Lfancybypass/component/FancyApplication;";
-            const Text factory=u"Lfancybypass/component/FancyAppFactory;";
+            require(!input.archive.find(SIGV4_ASSET),"SigFall asset collision.");
+            require(!input.archive.find(SIGV4_LIB64),"SigFall native library collision.");
+            require(!input.archive.find(SIGV4_LIB32),"SigFall native library collision.");
+            const Text helper=u"Lsigfall/component/SigFallApplication;";
+            const Text factory=u"Lsigfall/component/SigFallAppFactory;";
             auto appDesc=u"L"+input.info.applicationName+u";";
             for(auto& c:appDesc) if(c==u'.') c=u'/';
             for(size_t i=0;i<input.dexNames.size();++i) {
@@ -469,8 +469,8 @@ namespace dexpack {
             replacements["AndroidManifest.xml"]= {signatureKillerManifestV4(input.manifest,helper,input.info.applicationName,factory,sigV4.debuggable),false};
             {
                 auto manifestInfo=inspectManifest(replacements["AndroidManifest.xml"].data);
-                require(manifestInfo.applicationName==u"fancybypass.component.FancyApplication","Fancy bypass manifest application patch failed.");
-                require(manifestInfo.factoryName==u"fancybypass.component.FancyAppFactory","Fancy bypass manifest factory patch failed.");
+                require(manifestInfo.applicationName==u"sigfall.component.SigFallApplication","SigFall manifest application patch failed.");
+                require(manifestInfo.factoryName==u"sigfall.component.SigFallAppFactory","SigFall manifest factory patch failed.");
             }
             if (sigV4.embedOriginalApk || sigV4.replaceApkPath || sigV4.patchApplicationInfo) {
                 step("Embedding original APK with shared ZIP data",58);

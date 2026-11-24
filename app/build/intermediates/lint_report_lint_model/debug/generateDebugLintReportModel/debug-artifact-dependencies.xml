@@ -1,0 +1,23 @@
+<dependencies>
+  <compile
+      roots="de.robv.android.xposed:api:82@jar,com.android.tools.build:apksig:8.9.2@jar,org.bouncycastle:bcprov-jdk15to18:1.80@jar">
+    <dependency
+        name="de.robv.android.xposed:api:82@jar"
+        simpleName="de.robv.android.xposed:api"/>
+    <dependency
+        name="com.android.tools.build:apksig:8.9.2@jar"
+        simpleName="com.android.tools.build:apksig"/>
+    <dependency
+        name="org.bouncycastle:bcprov-jdk15to18:1.80@jar"
+        simpleName="org.bouncycastle:bcprov-jdk15to18"/>
+  </compile>
+  <package
+      roots="com.android.tools.build:apksig:8.9.2@jar,org.bouncycastle:bcprov-jdk15to18:1.80@jar">
+    <dependency
+        name="com.android.tools.build:apksig:8.9.2@jar"
+        simpleName="com.android.tools.build:apksig"/>
+    <dependency
+        name="org.bouncycastle:bcprov-jdk15to18:1.80@jar"
+        simpleName="org.bouncycastle:bcprov-jdk15to18"/>
+  </package>
+</dependencies>

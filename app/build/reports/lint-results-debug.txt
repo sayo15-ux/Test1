@@ -1,0 +1,234 @@
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/FancyBypassDialog.java:196: Warning: Implicitly using the default locale is a common source of bugs: Use toUpperCase(Locale) instead. For strings meant to be internal use Locale.ROOT, otherwise Locale.getDefault(). [DefaultLocale]
+        TextView view = Ui.text(c, label.toUpperCase(), 11, ACCENT, true);
+                                         ~~~~~~~~~~~
+
+   Explanation for issues of type "DefaultLocale":
+   Calling String#toLowerCase() or #toUpperCase() without specifying an
+   explicit locale is a common source of bugs. The reason for that is that
+   those methods will use the current locale on the user's device, and even
+   though the code appears to work correctly when you are developing the app,
+   it will fail in some locales. For example, in the Turkish locale, the
+   uppercase replacement for i is not I.
+
+   If you want the methods to just perform ASCII replacement, for example to
+   convert an enum name, call String#toUpperCase(Locale.ROOT) instead. If you
+   really want to use the current locale, call
+   String#toUpperCase(Locale.getDefault()) instead.
+
+   https://developer.android.com/reference/java/util/Locale.html#default_locale
+
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureHook.java:98: Warning: Field requires API level 28 (current min is 26): android.content.pm.PackageManager#GET_SIGNING_CERTIFICATES [InlinedApi]
+                int wanted = PackageManager.GET_SIGNATURES | PackageManager.GET_SIGNING_CERTIFICATES;
+                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/Ui.java:51: Warning: Field requires API level 29 (current min is 26): android.graphics.text.LineBreaker#BREAK_STRATEGY_SIMPLE [InlinedApi]
+        t.setIncludeFontPadding(false); t.setBreakStrategy(android.graphics.text.LineBreaker.BREAK_STRATEGY_SIMPLE);
+                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "InlinedApi":
+   This check scans through all the Android API field references in the
+   application and flags certain constants, such as static final integers and
+   Strings, which were introduced in later versions. These will actually be
+   copied into the class files rather than being referenced, which means that
+   the value is available even when running on older devices. In some cases
+   that's fine, and in other cases it can result in a runtime crash or
+   incorrect behavior. It depends on the context, so consider the code
+   carefully and decide whether it's safe and can be suppressed or whether the
+   code needs to be guarded.
+
+   If you really want to use this API and don't need to support older devices
+   just set the minSdkVersion in your build.gradle or AndroidManifest.xml
+   files.
+
+   If your code is deliberately accessing newer APIs, and you have ensured
+   (e.g. with conditional execution) that this code will only ever be called
+   on a supported platform, then you can annotate your class or method with
+   the @TargetApi annotation specifying the local minimum SDK to apply, such
+   as @TargetApi(11), such that this check considers 11 rather than your
+   manifest file's minimum SDK as the required API level.
+
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/HookConfig.java:40: Warning: Setting file permissions to world-readable can be risky, review carefully [SetWorldReadable]
+        if (preferencesFile.isFile()) preferencesFile.setReadable(true, false);
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetWorldReadable":
+   Setting files world-readable is very dangerous, and likely to cause
+   security holes in applications. It is strongly discouraged; instead,
+   applications should use more formal mechanisms for interactions such as
+   ContentProvider, BroadcastReceiver, and Service.
+
+   https://goo.gle/SetWorldReadable
+
+/workspace/Fallen/app/src/main/AndroidManifest.xml:39: Warning: Exported content providers can provide access to potentially sensitive data [ExportedContentProvider]
+        <provider
+         ~~~~~~~~
+
+   Explanation for issues of type "ExportedContentProvider":
+   Content providers are exported by default and any application on the system
+   can potentially use them to read and write data. If the content provider
+   provides access to sensitive data, it should be protected by specifying
+   export=false in the manifest or by protecting it with a permission that can
+   be granted to other applications.
+
+   https://goo.gle/ExportedContentProvider
+
+/workspace/Fallen/app/src/main/AndroidManifest.xml:15: Warning: The attribute android:allowBackup is deprecated from Android 12 and higher and may be removed in future versions. Consider adding the attribute android:dataExtractionRules specifying an @xml resource which configures cloud backups and device transfers on Android 12 and higher. [DataExtractionRules]
+        android:allowBackup="false"
+                             ~~~~~
+
+   Explanation for issues of type "DataExtractionRules":
+   Before Android 12, the attributes android:allowBackup and
+   android:fullBackupContent were used to configure all forms of backup,
+   including cloud backups, device-to-device transfers and adb backup.
+
+   In Android 12 and higher, these attributes have been deprecated and will
+   only apply to cloud backups. You should instead use the attribute
+   android:dataExtractionRules, specifying an @xml resource that configures
+   which files to back up, for cloud backups and for device-to-device
+   transfers, separately. If your minSdkVersion supports older versions,
+   you'll still want to specify an android:fullBackupContent resource if the
+   default behavior is not right for your app.
+
+   https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   https://goo.gle/DataExtractionRules
+
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/Ui.java:207: Warning: Custom view Icon is missing constructor used by tools: (Context) or (Context,AttributeSet) or (Context,AttributeSet,int) [ViewConstructor]
+    static final class Icon extends View {
+                       ~~~~
+
+   Explanation for issues of type "ViewConstructor":
+   Some layout tools (such as the Android layout editor) need to find a
+   constructor with one of the following signatures:
+   * View(Context context)
+   * View(Context context, AttributeSet attrs)
+   * View(Context context, AttributeSet attrs, int defStyle)
+
+   If your custom view needs to perform initialization which does not apply
+   when used in a layout editor, you can surround the given code with a check
+   to see if View#isInEditMode() is false, since that method will return false
+   at runtime but true within a user interface editor.
+
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/ExecutorDialog.java:37: Warning: Custom view `TextView` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+        log = Ui.text(c, "$ waiting for output…", 11, 0xffb7f7c2, false); log.setTypeface(Typeface.MONOSPACE); Ui.line(log, 16); log.setBackground(Ui.shape(c, 0xff1d1b20, 8)); log.setPadding(Ui.dp(c, 12), Ui.dp(c, 10), Ui.dp(c, 12), Ui.dp(c, 10)); log.setMinHeight(Ui.dp(c, 110)); log.setMaxLines(9); log.setTextIsSelectable(true); log.setMovementMethod(new ScrollingMovementMethod()); log.setTag("executorLog"); log.setOnTouchListener((v, event) -> { v.getParent().requestDisallowInterceptTouchEvent(true); return false; }); content.addView(log, Ui.lp(c, -1, -2)); Ui.marginTop(log, 12);
+                                                                                                                                                                                                                                                                                                                                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/ExecutorDialog.java:37: Warning: onTouch lambda should call View#performClick when a click is detected [ClickableViewAccessibility]
+        log = Ui.text(c, "$ waiting for output…", 11, 0xffb7f7c2, false); log.setTypeface(Typeface.MONOSPACE); Ui.line(log, 16); log.setBackground(Ui.shape(c, 0xff1d1b20, 8)); log.setPadding(Ui.dp(c, 12), Ui.dp(c, 10), Ui.dp(c, 12), Ui.dp(c, 10)); log.setMinHeight(Ui.dp(c, 110)); log.setMaxLines(9); log.setTextIsSelectable(true); log.setMovementMethod(new ScrollingMovementMethod()); log.setTag("executorLog"); log.setOnTouchListener((v, event) -> { v.getParent().requestDisallowInterceptTouchEvent(true); return false; }); content.addView(log, Ui.lp(c, -1, -2)); Ui.marginTop(log, 12);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ClickableViewAccessibility":
+   If a View that overrides onTouchEvent or uses an OnTouchListener does not
+   also implement performClick and call it when clicks are detected, the View
+   may not handle accessibility actions properly. Logic handling the click
+   actions should ideally be placed in View#performClick as some accessibility
+   services invoke performClick when a click action should occur.
+
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/ClassPicker.java:113: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        if (counter != null) counter.setText(selected.size() + " selected");
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/ClassPicker.java:113: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        if (counter != null) counter.setText(selected.size() + " selected");
+                                                               ~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/ExecutorDialog.java:51: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            tracks[i].progress(value); percentages[i].setText(value + "%");
+                                                              ~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/InstalledApps.java:76: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                new Handler(Looper.getMainLooper()).post(() -> { if (isShowing()) { all.clear(); all.addAll(result); filter(); status.setText("No applications found."); status.setVisibility(all.isEmpty() ? View.VISIBLE : View.GONE); } });
+                                                                                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/InstalledApps.java:77: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            } catch (Exception error) { new Handler(Looper.getMainLooper()).post(() -> status.setText("Could not read installed applications.")); }
+                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/MainActivity.java:147: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        ((TextView) classArea.findViewWithTag("classHeading")).setText("Select classes for String Encryption V" + app.mode);
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/MainActivity.java:147: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        ((TextView) classArea.findViewWithTag("classHeading")).setText("Select classes for String Encryption V" + app.mode);
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/MainActivity.java:148: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        count.setText(app.selection().size() + " selected"); clearClasses.setVisibility(app.selection().isEmpty() ? View.GONE : View.VISIBLE); clearClasses.setEnabled(!app.busy);
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/MainActivity.java:148: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        count.setText(app.selection().size() + " selected"); clearClasses.setVisibility(app.selection().isEmpty() ? View.GONE : View.VISIBLE); clearClasses.setEnabled(!app.busy);
+                                               ~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:129: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Certificate cleared. Tap Save configuration to persist.");
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:171: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Enter a valid package name, for example com.example.app.");
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:178: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        status.setText("Target added. Tap Save configuration to persist.");
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:210: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            certificate.setText("No replacement certificate selected. The hook will stay inactive.");
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:214: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            certificate.setText("The stored certificate could not be decoded. Choose another APK.");
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:217: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        certificate.setText("Certificate loaded\nSHA-256: " + certificateSha256
+                            ^
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:224: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Saved. Enable the module in Xposed/LSPosed and restart target apps.");
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:227: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            status.setText("Cannot save configuration: " + message(error));
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:227: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Cannot save configuration: " + message(error));
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:237: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        status.setText("Reading certificate from " + uri.getLastPathSegment() + "...");
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:237: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        status.setText("Reading certificate from " + uri.getLastPathSegment() + "...");
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:264: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                        status.setText("Using certificate: " + subject);
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:264: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                        status.setText("Using certificate: " + subject);
+                                       ~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:275: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                        status.setText("Cannot read certificate: " + text);
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/RuntimeHookDialog.java:275: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                        status.setText("Cannot read certificate: " + text);
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:115: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            status.setText("Cannot open APK: " + message(error));
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:115: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Cannot open APK: " + message(error));
+                           ~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:122: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("No APK was selected.");
+                           ~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:127: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            status.setText("Wait for the current operation to finish.");
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:134: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        status.setText("Inspecting " + apk.getName() + "...");
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SignatureTestDialog.java:134: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        status.setText("Inspecting " + apk.getName() + "...");
+                       ~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SigningSettings.java:59: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        app.busy = true; app.notifyState(); load.setEnabled(false); issue.setTextColor(Ui.MUTED); issue.setText("Loading key…");
+                                                                                                                ~~~~~~~~~~~~~~
+/workspace/Fallen/app/src/main/java/io/dexpack/tool/SigningSettings.java:70: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+                app.main.post(() -> { app.busy = false; app.signer = identity; app.notifyState(); if (isShowing()) { updateStatus(); issue.setText("Key loaded"); issue.setTextColor(Ui.PURPLE); load.setEnabled(true); accepted.accept(identity); } });
+                                                                                                                                                   ~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+0 errors, 41 warnings

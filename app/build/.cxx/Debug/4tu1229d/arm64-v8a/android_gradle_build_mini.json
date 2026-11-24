@@ -1,0 +1,58 @@
+{
+  "buildFiles": [
+    "/workspace/Fallen/app/src/main/cpp/Android.mk",
+    "/workspace/Fallen/app/src/main/cpp/Application.mk"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+      "NDK_PROJECT_PATH\u003dnull",
+      "APP_BUILD_SCRIPT\u003d/workspace/Fallen/app/src/main/cpp/Android.mk",
+      "NDK_APPLICATION_MK\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+      "APP_ABI\u003darm64-v8a",
+      "NDK_ALL_ABIS\u003darm64-v8a",
+      "NDK_DEBUG\u003d1",
+      "APP_PLATFORM\u003dandroid-26",
+      "NDK_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/obj",
+      "NDK_LIBS_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/lib",
+      "NDK_APPLICATION_MK:\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+    "NDK_PROJECT_PATH\u003dnull",
+    "APP_BUILD_SCRIPT\u003d/workspace/Fallen/app/src/main/cpp/Android.mk",
+    "NDK_APPLICATION_MK\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+    "APP_ABI\u003darm64-v8a",
+    "NDK_ALL_ABIS\u003darm64-v8a",
+    "NDK_DEBUG\u003d1",
+    "APP_PLATFORM\u003dandroid-26",
+    "NDK_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/obj",
+    "NDK_LIBS_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/lib",
+    "NDK_APPLICATION_MK:\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "dexprotection-debug-arm64-v8a": {
+      "artifactName": "dexprotection",
+      "buildCommandComponents": [
+        "/tmp/opencode/android-sdk/ndk/27.0.12077973/ndk-build",
+        "NDK_PROJECT_PATH\u003dnull",
+        "APP_BUILD_SCRIPT\u003d/workspace/Fallen/app/src/main/cpp/Android.mk",
+        "NDK_APPLICATION_MK\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+        "APP_ABI\u003darm64-v8a",
+        "NDK_ALL_ABIS\u003darm64-v8a",
+        "NDK_DEBUG\u003d1",
+        "APP_PLATFORM\u003dandroid-26",
+        "NDK_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/obj",
+        "NDK_LIBS_OUT\u003d/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/lib",
+        "NDK_APPLICATION_MK:\u003d/workspace/Fallen/app/src/main/cpp/Application.mk",
+        "/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/obj/local/arm64-v8a/libdexprotection.so"
+      ],
+      "abi": "arm64-v8a",
+      "output": "/workspace/Fallen/app/build/intermediates/cxx/Debug/4tu1229d/obj/local/arm64-v8a/libdexprotection.so",
+      "runtimeFiles": []
+    }
+  }
+}

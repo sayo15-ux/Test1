@@ -42,7 +42,7 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
     private SigningSettings settings;
     private SignatureTestDialog signatureTest;
     private RuntimeHookDialog runtimeHook;
-    private FancyBypassDialog fancyBypass;
+    private SigFallDialog sigFall;
     private final ArrayList<Dialog> dialogs = new ArrayList<>();
 
     void trackDialog(Dialog dialog) { dialogs.add(dialog); dialog.setOnDismissListener(d -> dialogs.remove(dialog)); }
@@ -242,13 +242,13 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         runtimeHook.show();
     }
 
-    private void openFancyBypass() {
+    private void openSigFall() {
         if (app.busy) {
             Toast.makeText(this, "Wait for the current operation to finish.", Toast.LENGTH_SHORT).show();
             return;
         }
-        fancyBypass = new FancyBypassDialog(this, app);
-        fancyBypass.show();
+        sigFall = new SigFallDialog(this, app);
+        sigFall.show();
     }
 
     private void openSignatureKillV3() {
@@ -286,14 +286,14 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         LinearLayout content = Ui.column(this); content.setPadding(Ui.dp(this, 12), Ui.dp(this, 28), Ui.dp(this, 12), Ui.dp(this, 28)); frame.addView(content, new FrameLayout.LayoutParams(-1, -1));
         TextView heading = Ui.text(this, "DEX Protection", 22, Ui.INK, false); heading.setPadding(Ui.dp(this, 16), 0, Ui.dp(this, 16), 0); content.addView(heading); Ui.marginTop(heading, 4);
         Ui.Sheet dialog = new Ui.Sheet(this, frame, true);
-        String[] labels = {"Test Signature", "Runtime Hook", "Signing settings", "FancyBypass", "APK/DEX Viewer"};
+        String[] labels = {"Test Signature", "Runtime Hook", "Signing settings", "SigFall", "APK/DEX Viewer"};
         String[] icons = {"check", "android", "key", "tools", "folder"};
-        String[] tags = {"drawerSignatureTest", "drawerRuntimeHook", "drawerKeySettings", "drawerFancyBypass", "drawerViewer"};
+        String[] tags = {"drawerSignatureTest", "drawerRuntimeHook", "drawerKeySettings", "drawerSigFall", "drawerViewer"};
         for (int i = 0; i < labels.length; i++) {
             final int item = i; boolean secondary = i == 2; LinearLayout row = Ui.row(this); row.setTag(tags[i]); row.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12)); Ui.ripple(row, secondary ? Color.TRANSPARENT : Ui.SELECTED, 28);
             int color = secondary ? Ui.MUTED : Ui.INK; row.addView(new Ui.Icon(this, icons[i], color), Ui.lp(this, 24, 24));
             TextView label = Ui.text(this, labels[i], 14, color, false); Ui.medium(label); LinearLayout.LayoutParams lp = Ui.lp(this, -2, -2); lp.leftMargin = Ui.dp(this, 14); row.addView(label, lp);
-            content.addView(row, Ui.lp(this, -1, 48)); Ui.marginTop(row, i == 0 ? 28 : 0); row.setFocusable(true); row.setOnClickListener(v -> { dialog.dismiss(); if (item == 0) openSignatureTest(); else if (item == 1) openRuntimeHook(); else if (item == 2) openKeySettings(false); else if (item == 3) openFancyBypass(); else openViewer(); });
+            content.addView(row, Ui.lp(this, -1, 48)); Ui.marginTop(row, i == 0 ? 28 : 0); row.setFocusable(true); row.setOnClickListener(v -> { dialog.dismiss(); if (item == 0) openSignatureTest(); else if (item == 1) openRuntimeHook(); else if (item == 2) openKeySettings(false); else if (item == 3) openSigFall(); else openViewer(); });
         }
         TextView version = Ui.text(this, "Version " + BuildConfig.VERSION_NAME, 12, Ui.MUTED, false); FrameLayout.LayoutParams vp = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START); vp.leftMargin = Ui.dp(this, 28); vp.bottomMargin = Ui.dp(this, 24); frame.addView(version, vp); dialog.show();
     }

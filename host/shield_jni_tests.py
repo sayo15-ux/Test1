@@ -17,7 +17,7 @@ def main():
     work.mkdir(parents=True, exist_ok=False)
     cpp = project / 'app/src/main/cpp'
     runtime = project / 'shield/src/main/cpp'
-    library = work / 'libScKitShieldV1.so'
+    library = work / 'libFallenShieldV1.so'
     subprocess.run([
         os.environ.get('CXX', 'c++'), '-std=c++17', '-O2', '-fPIC', '-shared', '-Wall', '-Wextra',
         '-I' + str(cpp), '-I' + str(args.java_home / 'include'), '-I' + str(args.java_home / 'include/linux'),
@@ -97,7 +97,7 @@ public class DexClassLoader extends BaseDexClassLoader {
   }
  }
 }''',
-        'cn/beingyi/sckit/shield1/LoaderTest.java': '''package cn.beingyi.sckit.shield1;
+        'cn/beingyi/fallen/shield1/LoaderTest.java': '''package cn.beingyi.fallen.shield1;
 import android.app.*;
 import android.content.*;
 import android.content.pm.ApplicationInfo;
@@ -144,14 +144,14 @@ public class LoaderTest {
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(body, encoding='utf-8')
         files.append(str(file))
-    files.append(str(project / 'shield/src/main/java/cn/beingyi/sckit/shield1/SubApp.java'))
+    files.append(str(project / 'shield/src/main/java/cn/beingyi/fallen/shield1/SubApp.java'))
     classes = work / 'classes'
     classes.mkdir()
     subprocess.run([str(args.java_home / 'bin/javac'), '-d', str(classes), *files], check=True)
     data = work / 'data'
     data.mkdir()
     subprocess.run([str(args.java_home / 'bin/java'), '-Xcheck:jni', '-Djava.library.path=' + str(work), '-cp', str(classes),
-                    'cn.beingyi.sckit.shield1.LoaderTest', str(args.apk.resolve()), str(data)], check=True)
+                    'cn.beingyi.fallen.shield1.LoaderTest', str(args.apk.resolve()), str(data)], check=True)
 
 
 if __name__ == '__main__':

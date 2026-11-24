@@ -6,7 +6,7 @@ int main(int argc,char**argv) {
         require(argc>=3,"Usage: dexpack classes|inspect|roundtrip|v1|v2|shield|signature input [output] [class-list]");
         std::string command=argv[1];
         if(command=="crypto") {
-            std::cout<<hex(md5(ascii(argv[2])))<<'\n'<<hex(sha1(reinterpret_cast<const uint8_t*>(argv[2]),std::strlen(argv[2])))<<'\n'<<utf8(encryptString(utf16(argv[2]),u"ScKit"))<<'\n';
+            std::cout<<hex(md5(ascii(argv[2])))<<'\n'<<hex(sha1(reinterpret_cast<const uint8_t*>(argv[2]),std::strlen(argv[2])))<<'\n'<<utf8(encryptString(utf16(argv[2]),u"Fallen"))<<'\n';
             return 0;
         }
         if(command=="roundtrip") {

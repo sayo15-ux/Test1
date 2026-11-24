@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         require(!fs::exists(root), "Test directory must not already exist."); fs::create_directories(root);
         Input original(argv[1]); auto apk = (root/"protected.apk").string();
         protect(original, apk, 0, {}, {});
-        Archive protectedApk(apk); auto bytes = protectedApk.extract("assets/ScKit_shield_v1.dex");
+        Archive protectedApk(apk); auto bytes = protectedApk.extract("assets/Fallen_shield_v1.dex");
         auto index = shield::inspect(bytes.data(), bytes.size());
         require(index.application == utf8(original.info.applicationName), "Original Application was lost.");
         require(index.hasApplication == original.info.hasApplication && index.dex.size() == original.dexNames.size(), "Shield metadata mismatch.");

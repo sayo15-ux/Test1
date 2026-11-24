@@ -26,7 +26,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Runtime signature-response interceptor (FancyBypass-style module)." />
+            android:value="Runtime signature-response interceptor (SigFall-style module)." />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />

@@ -1,7 +1,7 @@
 # Signature handling in DEX Protection
 
 This document records what is actually implemented in this project. It
-distinguishes static DEX Signature Kill from the separate FancyBypass-style
+distinguishes static DEX Signature Kill from the separate SigFall-style
 runtime interceptor that this project now provides as an Xposed/LSPosed module.
 
 ## 1. Existing code found during analysis
@@ -77,19 +77,19 @@ detected. Heavily modified apps still need manual DEX review. This static mode
 itself has no runtime component, no root requirement and no Xposed/LSPosed
 dependency; the optional runtime module in section 4 is a separate feature.
 
-## 4. FancyBypass-related runtime module (implemented, limited)
+## 4. SigFall-related runtime module (implemented, limited)
 
-Public information about FancyBypass is limited; it is distributed through
+Public information about SigFall is limited; it is distributed through
 NP Manager rather than as a documented public API. The points below are based
 on NP Manager release notes, public usage guides, and the publicly visible
 projects of its author (Eirv: `LSPlant`, `android-inline-hook`,
 `SimpleIORedirect`, `ElfLoader`, `SigPlus`). Details marked "inferred" are not
 verified against source.
 
-- **Hook framework / installation.** FancyBypass appears as NP Manager's
+- **Hook framework / installation.** SigFall appears as NP Manager's
   "去签" (de-sign) option and as the strongest "fancy" mode in its Test
   Signature feature. Public guides show the injected entry point
-  `fancybypass.component.FancyApplication` in the target's `AndroidManifest.xml`,
+  `sigfall.component.SigFallApplication` in the target's `AndroidManifest.xml`,
   i.e. the workflow *modifies the APK before installation* and the injected
   component runs inside the target app afterwards. NP Manager release notes
   mention fixes for running in an Xposed environment, so an Xposed/LSPosed
@@ -105,7 +105,7 @@ verified against source.
   static killer can often patch. Native checks, or checks that read APK bytes
   from disk, need the native interception layer described above and are
   outside the scope of DEX rewriting.
-- **Android versions / dependencies.** NP Manager notes reference a FancyBypass
+- **Android versions / dependencies.** NP Manager notes reference a SigFall
   version selector and adaptation to Android 17 Beta 3, HarmonyOS and Xposed
   environments. No authoritative compatibility matrix is published. The
   injected payload needs matching native libraries and an ART hooking
@@ -114,8 +114,8 @@ verified against source.
   changing the manifest entry, adding native libraries, then signing. On
   device: hooking calls and returning the spoofed signature while the app runs.
 
-Because FancyBypass itself is not publicly available, this project does **not**
-claim to ship it. It ships a clearly labelled **FancyBypass-style runtime
+Because SigFall itself is not publicly available, this project does **not**
+claim to ship it. It ships a clearly labelled **SigFall-style runtime
 interceptor**, implemented as an Xposed/LSPosed module inside the existing app:
 
 - `assets/xposed_init` plus manifest metadata register `SignatureHook` as a
@@ -138,8 +138,8 @@ interceptor**, implemented as an Xposed/LSPosed module inside the existing app:
   `HookConfigProvider` is a fallback for environments where that file is not
   readable.
 
-**Boundaries and honest limitations:** this is not FancyBypass, does not use
-`fancybypass.component.FancyApplication`, does not inject native libraries and
+**Boundaries and honest limitations:** this is not SigFall, does not use
+`sigfall.component.SigFallApplication`, does not inject native libraries and
 does not modify the target APK. It only changes Java-layer `PackageInfo`
 signature responses. It does not bypass native checks, direct APK file reads,
 self-integrity checks, reflection-based comparisons or installer signature

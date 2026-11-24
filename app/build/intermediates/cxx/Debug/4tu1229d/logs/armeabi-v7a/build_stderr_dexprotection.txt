@@ -1,0 +1,4 @@
+/workspace/Fallen/app/src/main/cpp/signature.cpp:194:14: warning: unused function 'descriptor' [-Wunused-function]
+  194 |         Text descriptor(const Text& name) {
+      |              ^~~~~~~~~~
+1 warning generated.

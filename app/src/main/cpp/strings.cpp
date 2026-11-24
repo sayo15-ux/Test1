@@ -43,7 +43,7 @@ namespace dexpack {
             if(m->flags!=9||m->ref->proto->type!=STR||m->ref->proto->params!=params||!m->code)continue;
             bool marker=false,decode=false;
             for(const auto&i:m->code->instructions)if(i.ref) {
-                marker|=i.ref->kind==Kind::String&&i.ref->text==u"ScKit-";
+                marker|=i.ref->kind==Kind::String&&i.ref->text==u"Fallen-";
                 decode|=i.ref->kind==Kind::Method&&i.ref->owner==templateOwner&&i.ref->text==u"decode";
             }
             if(marker&&decode) {
@@ -56,7 +56,7 @@ namespace dexpack {
     }
 
     static bool eligible(const Text&s) {
-        return !s.empty()&&s.compare(0,6,u"ScKit-")!=0&&validText(s);
+        return !s.empty()&&s.compare(0,7,u"Fallen-")!=0&&validText(s);
     }
     static std::vector<std::shared_ptr<Method>> methods(const Class&c) {
         auto a=c.direct;
@@ -191,7 +191,7 @@ namespace dexpack {
         };
         for(uint32_t i=0;i<n;++i) {
             auto found=ctx.v2.find(strings[i]);
-            if(found==ctx.v2.end())found=ctx.v2.emplace(strings[i],encryptString(strings[i],u"ScKit")).first;
+            if(found==ctx.v2.end())found=ctx.v2.emplace(strings[i],encryptString(strings[i],u"Fallen")).first;
             append(code, {
                 string(1,found->second),constant(2,int32_t(i)),raw( {
                     0x014d,0x0203
@@ -258,7 +258,7 @@ namespace dexpack {
                             continue;
                         }
                         const auto&text=i.ref->text;
-                        auto password=utf16("ScKit-"+hex(md5(ascii(utf8(c.type)+std::to_string(ctx.millis())))).substr(8,16));
+                        auto password=utf16("Fallen-"+hex(md5(ascii(utf8(c.type)+std::to_string(ctx.millis())))).substr(8,16));
                         auto cache=std::make_pair(password,text);
                         auto it=ctx.v1.find(cache);
                         if(it==ctx.v1.end())it=ctx.v1.emplace(cache,encryptString(text,password)).first;
@@ -312,7 +312,7 @@ namespace dexpack {
                     ordered.push_back(i.ref->text);
                 }
                 if(unique.empty())continue;
-                auto f=field(c.type,fresh(c,u"$sckit$"+utf16(ctx.token),true),ARRAY);
+                auto f=field(c.type,fresh(c,u"$fallen$"+utf16(ctx.token),true),ARRAY);
                 c.staticFields.push_back( {
                     f,10,{}
                 });
@@ -352,7 +352,7 @@ namespace dexpack {
                         else {
                             auto it=bridges.find(index);
                             if(it==bridges.end()) {
-                                auto ref=method(c.type,fresh(c,u"$sckit$get$"+utf16(std::to_string(index)),false),STR);
+                                auto ref=method(c.type,fresh(c,u"$fallen$get$"+utf16(std::to_string(index)),false),STR);
                                 it=bridges.emplace(index,ref).first;
                                 auto code=lookup(f,index,0,0);
                                 code.push_back(raw( {
