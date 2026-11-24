@@ -442,7 +442,7 @@ namespace dexpack {
                     fixDex(data);
                     if(sigV4.cleanRoom&&!signatureDigest.empty()) {
                         auto patched=dex::read(data);
-                        dex::patchSignatureDigests(patched,utf16(signatureDigest));
+                        dex::patchSignatureDigests(patched,signatureDigest);
                         data=dex::write(patched);
                     }
                     replacements[name]={data,false};
