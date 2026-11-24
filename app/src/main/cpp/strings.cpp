@@ -43,7 +43,7 @@ namespace dexpack {
             if(m->flags!=9||m->ref->proto->type!=STR||m->ref->proto->params!=params||!m->code)continue;
             bool marker=false,decode=false;
             for(const auto&i:m->code->instructions)if(i.ref) {
-                marker|=i.ref->kind==Kind::String&&i.ref->text==u"Fallen-";
+                marker|=i.ref->kind==Kind::String&&(i.ref->text==u"Fallen-"||i.ref->text==u"ScKit-");
                 decode|=i.ref->kind==Kind::Method&&i.ref->owner==templateOwner&&i.ref->text==u"decode";
             }
             if(marker&&decode) {
@@ -56,7 +56,7 @@ namespace dexpack {
     }
 
     static bool eligible(const Text&s) {
-        return !s.empty()&&s.compare(0,7,u"Fallen-")!=0&&validText(s);
+        return !s.empty()&&s.compare(0,7,u"Fallen-")!=0&&s.compare(0,6,u"ScKit-")!=0&&validText(s);
     }
     static std::vector<std::shared_ptr<Method>> methods(const Class&c) {
         auto a=c.direct;
