@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "fancy_payloads.hpp"
 #include <iostream>
 using namespace dexpack;
 using namespace dexpack::dex;
@@ -229,6 +230,28 @@ static void signatureKiller() {
     for (const auto& c : out.classes) if (c.type == options.className) helperFound = true;
     expect(helperFound, "Generated helper class is missing");
 }
+static void nativeHelper() {
+    auto model = read(fancy::referenceDex());
+    expect(model.classes.size() > 50, "Reference native helper is missing classes");
+    const Text before = u"Lorg/clipbox/player/ClipBoxApplication;";
+    const Text after = u"Lorg/test/TestApplication;";
+    rename(model, before, after);
+    auto bytes = write(model);
+    validateDex(bytes);
+    const auto out = read(bytes);
+    expect(out.classes.size() == model.classes.size(), "Native helper lost classes after patch");
+    bool target = false, legacy = false;
+    for (const auto& c : out.classes) for (const auto& m : c.direct) {
+        if (!m->code) continue;
+        for (const auto& i : m->code->instructions) {
+            if (!i.ref || i.ref->kind != Kind::String) continue;
+            target |= i.ref->text == after;
+            legacy |= i.ref->text == before;
+        }
+    }
+    expect(target, "Target application class was not patched into native helper");
+    expect(!legacy, "ClipBox application class remained in native helper");
+}
 int main() {
     try {
         crypto();
@@ -238,7 +261,8 @@ int main() {
         sharedCodeAndMetadata();
         referenceTemplates();
         signatureKiller();
-        std::cout << "7 native test groups passed\n";
+        nativeHelper();
+        std::cout << "8 native test groups passed\n";
         return 0;
     }
     catch (const std::exception& error) {
