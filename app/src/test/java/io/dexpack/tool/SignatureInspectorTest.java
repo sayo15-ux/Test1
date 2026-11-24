@@ -102,7 +102,7 @@ public final class SignatureInspectorTest {
         SignatureInspector.CertificateSource source = SignatureInspector.primaryCertificate(sample);
         assertFalse(source.base64.isEmpty());
         assertFalse(source.subject.isEmpty());
-        assertEquals(64, source.sha256.length());
+        assertEquals(64, source.sha256.replace(":", "").length());
         assertTrue(Base64.getDecoder().decode(source.base64).length > 0);
     }
 }

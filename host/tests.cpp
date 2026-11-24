@@ -215,38 +215,19 @@ static void referenceTemplates() {
     }
 }
 static void signatureKiller() {
-    Model m;
-    Class c;
-    c.type = u"Ltest/Sig;";
-    c.flags = 0x11;
-    c.super = u"Ljava/lang/Object;";
-    auto hash = method(u"Landroid/content/pm/Signature;", u"hashCode", u"I");
-    auto md = method(u"Ljava/security/MessageDigest;", u"getInstance", u"Ljava/security/MessageDigest;", {u"Ljava/lang/String;"});
-    auto eq = method(u"Ljava/util/Arrays;", u"equals", u"Z", {u"[B", u"[B"});
-    c.direct.push_back(newMethod(method(c.type, u"check", u"Z"), 9,
-        newCode({invoke(hash, 0), raw({0x0f})}, 1, 0, 1)));
-    c.direct.push_back(newMethod(method(c.type, u"digest", u"I"), 9,
-        newCode({invoke(md, 0), invoke(eq, 0), raw({0x0f})}, 1, 0, 2)));
-    c.direct.push_back(newMethod(method(c.type, u"plain", u"Ljava/lang/String;"), 9,
-        newCode({raw({17})}, 1, 0, 1)));
-    c.direct.push_back(newMethod(method(c.type, u"<init>", u"V"), 0x10001,
-        newCode({invoke(hash, 0), raw({14})}, 1, 0, 1)));
-    m.classes.push_back(c);
-    const auto input = write(m);
-    auto result = killSignatures(input);
-    expect(result.changed, "Signature checks were not detected");
-    expect(result.report.methods == 2, "Unexpected number of patched methods");
-    const auto out = read(result.bytes);
-    for (const auto& patched : out.classes[0].direct) {
-        const auto& code = patched->code->instructions;
-        if (patched->ref->text == u"check" || patched->ref->text == u"digest") {
-            expect(code.size() == 2 && code[0].op == 0x13 && code[1].op == 0x0f, "Verification method was not stubbed");
-        }
-        if (patched->ref->text == u"plain") expect(code.size() == 1, "Unrelated method was modified");
-        if (patched->ref->text == u"<init>") expect(code.size() == 2, "Constructor was stubbed");
-    }
+    Archive apk("../sample application.apk");
+    SignatureOptions options;
+    options.className = u"Ltest/SigHelper;";
+    auto result = killSignatures(apk, options);
+    expect(result.changed, "Signature helper was not generated");
+    expect(result.report.classes == 1, "Unexpected number of generated classes");
+    expect(result.report.methods == 8, "Unexpected number of generated methods");
+    expect(result.report.sites > 0, "Certificate was not embedded");
     validateDex(result.bytes);
-    expect(!killSignatures(write(fixture(2))).changed, "Clean DEX was modified");
+    const auto out = read(result.bytes);
+    bool helperFound = false;
+    for (const auto& c : out.classes) if (c.type == options.className) helperFound = true;
+    expect(helperFound, "Generated helper class is missing");
 }
 int main() {
     try {

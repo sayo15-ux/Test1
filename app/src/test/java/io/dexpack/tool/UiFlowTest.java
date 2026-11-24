@@ -95,10 +95,10 @@ public class UiFlowTest {
     }
     @Test public void progressAndOutputUseTheExecutorDialog() throws Exception {
         try (var controller = Robolectric.buildActivity(MainActivity.class).setup()) {
-            MainActivity a = controller.get(); ProtectionApp app = (ProtectionApp) a.getApplication(); fixture(app); app.mode = 0; app.hasExecution = true; app.processing = true; app.busy = true; app.percent = 30; app.status = "Building DEX…"; app.notifyState();
-            ExecutorDialog executor = new ExecutorDialog(a, app); executor.show(); executor.update(); settle(); Dialog d = ShadowDialog.getLatestDialog(); captureDialog(a, d, "executor-running");
-            app.percent = 100; app.processing = false; app.busy = false; app.saved = new Storage.Saved(Uri.parse("file:///storage/emulated/0/Download/Telegram/sample-protected.apk"), "/storage/emulated/0/Download/Telegram/sample-protected.apk", true); app.status = "Output saved"; app.notifyState(); executor.update(); settle();
-            assertEquals(View.VISIBLE, tag(a, "viewOutput").getVisibility()); captureDialog(a, d, "executor-complete"); executor.dismissImmediately();
+            MainActivity a = controller.get(); ProtectionApp app = (ProtectionApp) a.getApplication(); fixture(app); app.mode = 0; app.hasExecution = true; app.processing = true; app.busy = true; app.percent = 30; app.status = "Building DEX…"; app.notifyState(); settle();
+            Dialog d = ShadowDialog.getLatestDialog(); assertTrue(d.isShowing()); captureDialog(a, d, "executor-running");
+            app.percent = 100; app.processing = false; app.busy = false; app.saved = new Storage.Saved(Uri.parse("file:///storage/emulated/0/Download/Telegram/sample-protected.apk"), "/storage/emulated/0/Download/Telegram/sample-protected.apk", true); app.status = "Output saved"; app.notifyState(); settle();
+            assertEquals(View.VISIBLE, tag(a, "viewOutput").getVisibility()); captureDialog(a, d, "executor-complete"); d.dismiss(); settle();
             tag(a, "viewOutput").performClick(); settle(); assertTrue(ShadowDialog.getLatestDialog().isShowing());
         }
     }
