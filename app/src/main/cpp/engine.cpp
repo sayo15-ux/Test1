@@ -491,8 +491,8 @@ namespace dexpack {
                 const char* msg="Placing some dex files here can be dynamically loaded\n";
                 replacements["fancy/dex/README.txt"] = {Bytes(msg,msg+54), false};
             }
-            replacements[SIGV4_LIB64] = {fancy::library("arm64"), true};
-            replacements[SIGV4_LIB32] = {fancy::library("arm"), true};
+            replacements[SIGV4_LIB64] = {sigV4.cleanRoom?fancy::ownLibrary("arm64"):fancy::library("arm64"), true};
+            replacements[SIGV4_LIB32] = {sigV4.cleanRoom?fancy::ownLibrary("arm"):fancy::library("arm"), true};
         }
         else {
             require(!selected.empty(),"Select at least one class.");

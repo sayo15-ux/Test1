@@ -129,17 +129,25 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
 }
 
 def fancyRefDir = file('src/main/cpp/sigfall_ref')
+def sigfallDir = file('src/main/cpp/sigfall_payload')
 def fancyOutput = layout.buildDirectory.dir('generated/fancy')
 def generateFancyPayloads = tasks.register('generateFancyPayloads') {
     inputs.file(new File(fancyRefDir, 'arm.so'))
     inputs.file(new File(fancyRefDir, 'arm64.so'))
     inputs.file(new File(fancyRefDir, 'classes3.dex'))
+    inputs.file(new File(sigfallDir, 'arm.so'))
+    inputs.file(new File(sigfallDir, 'arm64.so'))
     outputs.file(fancyOutput.map { it.file('fancy_payloads.cpp') })
     doLast {
         def payloads = [:]
         ['arm': 'arm.so', 'arm64': 'arm64.so', 'refdex': 'classes3.dex'].each { name, fileName ->
             File library = new File(fancyRefDir, fileName)
             if (!library.exists()) throw new GradleException("Fancy reference library missing: ${library}")
+            payloads[name] = library.bytes
+        }
+        ['own_arm': 'arm.so', 'own_arm64': 'arm64.so'].each { name, fileName ->
+            File library = new File(sigfallDir, fileName)
+            if (!library.exists()) throw new GradleException("SigFall library missing: ${library}")
             payloads[name] = library.bytes
         }
         File output = fancyOutput.get().asFile
@@ -158,7 +166,7 @@ def generateFancyPayloads = tasks.register('generateFancyPayloads') {
                 }
                 writer.write("};\nBytes packed; packed.reserve(${compressed.length});\nfor (const char* chunk : chunks) { auto part = from64(chunk); packed.insert(packed.end(), part.begin(), part.end()); }\nuLongf size = ${bytes.length}; Bytes result(size);\nrequire(uncompress(result.data(), &size, packed.data(), packed.size()) == Z_OK && size == ${bytes.length}, \"Invalid Fancy native payload.\");\nreturn result;\n}\n")
             }
-            writer.write('Bytes referenceDex() { return data_refdex(); }\nBytes library(const std::string& abi) {\nif (abi == "arm") return data_arm();\nif (abi == "arm64") return data_arm64();\nthrow std::runtime_error("Unsupported Fancy ABI.");\n}\n}\n')
+            writer.write('Bytes referenceDex() { return data_refdex(); }\nBytes library(const std::string& abi) {\nif (abi == "arm") return data_arm();\nif (abi == "arm64") return data_arm64();\nthrow std::runtime_error("Unsupported Fancy ABI.");\n}\nBytes ownLibrary(const std::string& abi) {\nif (abi == "arm") return data_own_arm();\nif (abi == "arm64") return data_own_arm64();\nthrow std::runtime_error("Unsupported SigFall ABI.");\n}\n}\n')
         }
     }
 }
