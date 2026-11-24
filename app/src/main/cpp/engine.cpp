@@ -440,11 +440,6 @@ namespace dexpack {
                 }
                 if(changed) {
                     fixDex(data);
-                    if(sigV4.cleanRoom&&!signatureDigest.empty()) {
-                        auto patched=dex::read(data);
-                        dex::patchSignatureDigests(patched,signatureDigest);
-                        data=dex::write(patched);
-                    }
                     replacements[name]={data,false};
                 }
             }
@@ -456,6 +451,11 @@ namespace dexpack {
             options.originalApkAsset=utf16(SIGV4_ASSET);
             options.classes=names;
             options.v4=sigV4;
+            if (sigV4.cleanRoom) {
+                options.v4.embedOriginalApk=true;
+                options.v4.replaceApkPath=true;
+                options.v4.patchApplicationInfo=true;
+            }
             auto result=killSignaturesV4(input.archive,options,[&](const std::string&s,int n) {
                 step(s,15+n/2);
             });
@@ -488,7 +488,7 @@ namespace dexpack {
                     require(manifestInfo.factoryName==u"fancybypass.component.FancyAppFactory","SigFall manifest factory patch failed.");
                 }
             }
-            if (sigV4.embedOriginalApk || sigV4.replaceApkPath || sigV4.patchApplicationInfo) {
+            if (options.v4.embedOriginalApk || options.v4.replaceApkPath || options.v4.patchApplicationInfo) {
                 step("Embedding original APK with shared ZIP data",58);
                 replacements[SIGV4_ASSET]= {readFile(input.archive.path()),true,true};
             }

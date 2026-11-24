@@ -24,7 +24,7 @@
 namespace {
 
 const char* const kHidden[] = {
-    "origin.apk", "libsigfall", "fancy/lib", "fancy/dex", "fancy_origin"
+    "libsigfall", "fancy/lib", "fancy/dex", "fancy_origin"
 };
 
 bool hiddenPath(const char* path) {
@@ -35,6 +35,53 @@ bool hiddenPath(const char* path) {
 
 bool isMaps(const char* path) {
     return path && strcmp(path, "/proc/self/maps") == 0;
+}
+
+int rawOpen(const char* path, int flags);
+
+std::string processName() {
+    int fd = rawOpen("/proc/self/cmdline", O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return {};
+    char buffer[512] = {0};
+    long size = syscall(__NR_read, fd, buffer, sizeof(buffer) - 1);
+    syscall(__NR_close, fd);
+    if (size <= 0) return {};
+    return std::string(buffer, (size_t)strnlen(buffer, sizeof(buffer) - 1));
+}
+
+std::string originApkPath() {
+    static std::string cached;
+    if (!cached.empty()) return cached;
+    std::string name = processName();
+    if (name.empty() || name.find('/') != std::string::npos) return {};
+    for (const char* prefix : {"/data/user/0/", "/data/data/"}) {
+        std::string candidate = std::string(prefix) + name + "/files/fancy/origin.apk";
+        int fd = rawOpen(candidate.c_str(), O_RDONLY | O_CLOEXEC);
+        if (fd >= 0) {
+            syscall(__NR_close, fd);
+            cached = candidate;
+            return cached;
+        }
+    }
+    return {};
+}
+
+const char* resolvePath(const char* path) {
+    if (path && strstr(path, "/data/app/") && strstr(path, ".apk")) {
+        std::string origin = originApkPath();
+        if (!origin.empty()) {
+            static std::string redirected;
+            redirected = origin;
+            return redirected.c_str();
+        }
+    }
+    return path;
+}
+
+const char* hookPath(const char* path) {
+    const char* resolved = resolvePath(path);
+    if (resolved != path) return resolved;
+    return hiddenPath(path) ? nullptr : path;
 }
 
 int rawOpen(const char* path, int flags) {
@@ -97,8 +144,9 @@ int hookedOpen(const char* path, int flags, ...) {
         va_list ap; va_start(ap, flags); mode = (mode_t)va_arg(ap, int); va_end(ap);
     }
     if (isMaps(path)) return filteredMapsFd();
-    if (hiddenPath(path)) { errno = ENOENT; return -1; }
-    return g_open ? g_open(path, flags, mode) : -1;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return -1; }
+    return g_open ? g_open(target, flags, mode) : -1;
 }
 
 int hookedOpenat(int dirfd, const char* path, int flags, ...) {
@@ -107,8 +155,9 @@ int hookedOpenat(int dirfd, const char* path, int flags, ...) {
         va_list ap; va_start(ap, flags); mode = (mode_t)va_arg(ap, int); va_end(ap);
     }
     if (isMaps(path)) return filteredMapsFd();
-    if (hiddenPath(path)) { errno = ENOENT; return -1; }
-    return g_openat ? g_openat(dirfd, path, flags, mode) : -1;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return -1; }
+    return g_openat ? g_openat(dirfd, target, flags, mode) : -1;
 }
 
 FILE* hookedFopen(const char* path, const char* mode) {
@@ -116,26 +165,30 @@ FILE* hookedFopen(const char* path, const char* mode) {
         int fd = filteredMapsFd();
         return fd < 0 ? nullptr : fdopen(fd, mode);
     }
-    if (hiddenPath(path)) { errno = ENOENT; return nullptr; }
-    return g_fopen ? g_fopen(path, mode) : nullptr;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return nullptr; }
+    return g_fopen ? g_fopen(target, mode) : nullptr;
 }
 
 int hookedAccess(const char* path, int mode) {
     if (isMaps(path)) return 0;
-    if (hiddenPath(path)) { errno = ENOENT; return -1; }
-    return g_access ? g_access(path, mode) : -1;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return -1; }
+    return g_access ? g_access(target, mode) : -1;
 }
 
 int hookedStat(const char* path, struct stat* info) {
     if (isMaps(path)) return 0;
-    if (hiddenPath(path)) { errno = ENOENT; return -1; }
-    return g_stat ? g_stat(path, info) : -1;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return -1; }
+    return g_stat ? g_stat(target, info) : -1;
 }
 
 int hookedFstatat(int dirfd, const char* path, struct stat* info, int flags) {
     if (isMaps(path)) return 0;
-    if (hiddenPath(path)) { errno = ENOENT; return -1; }
-    return g_fstatat ? g_fstatat(dirfd, path, info, flags) : -1;
+    const char* target = hookPath(path);
+    if (!target) { errno = ENOENT; return -1; }
+    return g_fstatat ? g_fstatat(dirfd, target, info, flags) : -1;
 }
 
 struct HookRecord {
