@@ -465,7 +465,7 @@ namespace dexpack {
                     break;
                 }
             }
-            replacements[helperDexName] = {fancy::referenceDex(), false};
+            replacements[helperDexName] = {result.bytes, false};
             replacements["AndroidManifest.xml"]= {signatureKillerManifestV4(input.manifest,helper,input.info.applicationName,factory,sigV4.debuggable),false};
             {
                 auto manifestInfo=inspectManifest(replacements["AndroidManifest.xml"].data);
