@@ -167,7 +167,7 @@ namespace dexpack {
         fixDex(w.b);
         return w.b;
     }
-    StringReport protect(const Input&input,const std::string&output,int mode,const std::set<Text>&selected,const Progress&progress,std::optional<int64_t>fixedClock,const SignatureKillV3Options& sigV3,const SignatureKillV4Options& sigV4) {
+    StringReport protect(const Input&input,const std::string&output,int mode,const std::set<Text>&selected,const Progress&progress,std::optional<int64_t>fixedClock,const SignatureKillV3Options& sigV3,const SignatureKillV4Options& sigV4,const Text& signatureDigest) {
         require(mode>=0&&mode<=6,"Unknown protection mode.");
         auto step=[&](const std::string&s,int n) {
             if(progress)progress(s,n);

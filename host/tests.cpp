@@ -224,7 +224,7 @@ static void signatureDigests() {
     cls.flags = 0x1;
     cls.super = u"Ljava/lang/Object;";
     auto sig = method(u"Landroid/content/pm/Signature;", u"toByteArray", u"[B");
-    auto code = newCode({string(0, before), call(sig, 0, 0, 0x6e), raw({0x0e})}, 2);
+    auto code = newCode({string(0, before), invoke(sig, 0, 1), raw({0x0e})}, 2);
     cls.direct.push_back(newMethod(method(cls.type, u"check", u"V"), 0x9, code));
     model.classes.push_back(cls);
     patchSignatureDigests(model, after);
