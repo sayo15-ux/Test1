@@ -41,7 +41,7 @@ jobs:
           done
           [ -z "$SDKMANAGER" ] && { echo "::error::no sdkmanager"; exit 1; }
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
-          "$SDKMANAGER" --install platforms;android-35 build-tools;35.0.0 ndk;27.0.12077973 platform-tools
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973"
           test -d "$SDK/ndk/27.0.12077973"
           echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH" || true
 
