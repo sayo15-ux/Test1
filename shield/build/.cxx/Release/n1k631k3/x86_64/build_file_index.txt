@@ -1,2 +1,0 @@
-/workspace/Fallen/shield/src/main/cpp/Android.mk
-/workspace/Fallen/shield/src/main/cpp/Application.mk

@@ -1,0 +1,5 @@
+.gradle/
+build/
+app/build/
+shield/build/
+app-debug.apk

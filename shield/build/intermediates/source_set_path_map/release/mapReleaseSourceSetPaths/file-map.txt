@@ -1,7 +1,0 @@
-cn.beingyi.sckit.shield1.shield-pngs-0 /workspace/Fallen/shield/build/generated/res/pngs/release
-cn.beingyi.sckit.shield1.shield-resValues-1 /workspace/Fallen/shield/build/generated/res/resValues/release
-cn.beingyi.sckit.shield1.shield-mergeReleaseResources-2 /workspace/Fallen/shield/build/intermediates/incremental/release/mergeReleaseResources/merged.dir
-cn.beingyi.sckit.shield1.shield-mergeReleaseResources-3 /workspace/Fallen/shield/build/intermediates/incremental/release/mergeReleaseResources/stripped.dir
-cn.beingyi.sckit.shield1.shield-release-4 /workspace/Fallen/shield/build/intermediates/merged_res/release/mergeReleaseResources
-cn.beingyi.sckit.shield1.shield-main-5 /workspace/Fallen/shield/src/main/res
-cn.beingyi.sckit.shield1.shield-release-6 /workspace/Fallen/shield/src/release/res

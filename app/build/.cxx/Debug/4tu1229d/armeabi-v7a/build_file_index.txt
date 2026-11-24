@@ -1,2 +1,0 @@
-/workspace/Fallen/app/src/main/cpp/Android.mk
-/workspace/Fallen/app/src/main/cpp/Application.mk

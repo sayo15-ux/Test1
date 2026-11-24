@@ -1,5 +1,0 @@
-cn.beingyi.sckit.shield1.test.shield-test-0 /workspace/Fallen/shield/build/generated/res/resValues/test/release
-cn.beingyi.sckit.shield1.test.shield-mergeReleaseUnitTestResources-1 /workspace/Fallen/shield/build/intermediates/incremental/releaseUnitTest/mergeReleaseUnitTestResources/merged.dir
-cn.beingyi.sckit.shield1.test.shield-mergeReleaseUnitTestResources-2 /workspace/Fallen/shield/build/intermediates/incremental/releaseUnitTest/mergeReleaseUnitTestResources/stripped.dir
-cn.beingyi.sckit.shield1.test.shield-releaseUnitTest-3 /workspace/Fallen/shield/build/intermediates/merged_res/releaseUnitTest/mergeReleaseUnitTestResources
-cn.beingyi.sckit.shield1.test.shield-release-4 /workspace/Fallen/shield/build/intermediates/packaged_res/release/packageReleaseResources

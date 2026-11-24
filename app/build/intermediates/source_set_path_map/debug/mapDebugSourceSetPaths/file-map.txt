@@ -1,7 +1,0 @@
-io.dexpack.tool.app-pngs-0 /workspace/Fallen/app/build/generated/res/pngs/debug
-io.dexpack.tool.app-resValues-1 /workspace/Fallen/app/build/generated/res/resValues/debug
-io.dexpack.tool.app-packageDebugResources-2 /workspace/Fallen/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-io.dexpack.tool.app-packageDebugResources-3 /workspace/Fallen/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-io.dexpack.tool.app-debug-4 /workspace/Fallen/app/build/intermediates/merged_res/debug/mergeDebugResources
-io.dexpack.tool.app-debug-5 /workspace/Fallen/app/src/debug/res
-io.dexpack.tool.app-main-6 /workspace/Fallen/app/src/main/res

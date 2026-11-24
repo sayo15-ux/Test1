@@ -1,3 +1,0 @@
-[armeabi-v7a] Compile++ thumb: dexprotection <= strings.cpp
-[armeabi-v7a] Compile++ thumb: dexprotection <= signature.cpp
-[armeabi-v7a] Compile++ thumb: dexprotection <= payloads.cpp
