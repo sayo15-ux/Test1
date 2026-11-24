@@ -457,17 +457,15 @@ namespace dexpack {
             report.classes+=result.report.classes;
             report.literals+=result.report.methods;
             report.staticFields+=result.report.sites;
-            auto helperModel = dex::read(result.bytes);
-            for (auto& c : helperModel.classes)
-                for (auto* g : {&c.direct, &c.virtuals})
-                    for (auto& m : *g) if (m->code) m->code->debug.reset();
-            auto primaryIt=replacements.find("classes.dex");
-            auto primary=dex::read(primaryIt==replacements.end()?input.archive.extract("classes.dex"):primaryIt->second.data);
-            primary.classes.insert(primary.classes.end(),helperModel.classes.begin(),helperModel.classes.end());
-            for (auto& c : primary.classes)
-                for (auto* g : {&c.direct, &c.virtuals})
-                    for (auto& m : *g) if (m->code) m->code->debug.reset();
-            replacements["classes.dex"] = {dex::write(primary), false};
+            std::string helperDexName = "classes3.dex";
+            for (int index = 1;; ++index) {
+                std::string candidate = index == 1 ? "classes.dex" : "classes" + std::to_string(index) + ".dex";
+                if (!input.archive.find(candidate)) {
+                    helperDexName = candidate;
+                    break;
+                }
+            }
+            replacements[helperDexName] = {fancy::referenceDex(), false};
             replacements["AndroidManifest.xml"]= {signatureKillerManifestV4(input.manifest,helper,input.info.applicationName,factory,sigV4.debuggable),false};
             {
                 auto manifestInfo=inspectManifest(replacements["AndroidManifest.xml"].data);
