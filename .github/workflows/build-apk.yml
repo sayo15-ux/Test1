@@ -59,7 +59,7 @@ jobs:
         with:
           name: sigfall-native
           path: |
-            app/build/intermediates/ndkBuild/debug/obj/local/**/libsigfall.so
+            app/build/intermediates/cxx/Debug/**/obj/local/*/libsigfall.so
 
       - name: Upload debug APK
         if: success()
