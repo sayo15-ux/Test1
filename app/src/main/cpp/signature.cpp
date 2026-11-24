@@ -1515,7 +1515,7 @@ namespace dexpack {
         ia.add(raw({uint16_t(0x11|(0<<8)),0}));
         ia.instructions[notProxy].target=uint32_t(ia.instructions.size());
         ia.add(moveObject(0,3)); ia.add(moveObject(1,4)); ia.add(moveObject(2,5));
-        ia.add(call(method(u"Landroid/app/AppComponentFactory;",u"instantiateApplication",APPLICATION,{LOADER,STRING}),0,3,0x76)); ia.add(resultObject(0));
+        ia.add(call(method(u"Landroid/app/AppComponentFactory;",u"instantiateApplication",APPLICATION,{LOADER,STRING}),0,3,0x75)); ia.add(resultObject(0));
         ia.add(typeOp(0x1f,0,APPLICATION));
         ia.add(raw({uint16_t(0x11|(0<<8)),0}));
         fac.virtuals.push_back(newMethod(method(factory,u"instantiateApplication",APPLICATION,{LOADER,STRING}),0x1,ia.build(6,3,3)));
