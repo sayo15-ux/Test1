@@ -378,9 +378,26 @@ void installHooks() {
 }
 }  // namespace
 
+void exemptHiddenApis(JNIEnv* env) {
+    jclass runtimeClass = env->FindClass("dalvik/system/VMRuntime");
+    if (!runtimeClass || env->ExceptionCheck()) { env->ExceptionClear(); return; }
+    jmethodID getRuntime = env->GetStaticMethodID(runtimeClass, "getRuntime", "()Ldalvik/system/VMRuntime;");
+    if (!getRuntime || env->ExceptionCheck()) { env->ExceptionClear(); return; }
+    jobject runtime = env->CallStaticObjectMethod(runtimeClass, getRuntime);
+    if (!runtime || env->ExceptionCheck()) { env->ExceptionClear(); return; }
+    jmethodID setExemptions = env->GetMethodID(runtimeClass, "setHiddenApiExemptions", "([Ljava/lang/String;)V");
+    if (!setExemptions || env->ExceptionCheck()) { env->ExceptionClear(); return; }
+    jstring signature = env->NewStringUTF("L");
+    jobjectArray exemptions = env->NewObjectArray(1, env->FindClass("java/lang/String"), signature);
+    env->CallVoidMethod(runtime, setExemptions, exemptions);
+    env->ExceptionClear();
+    LOGI("hidden API exemptions installed");
+}
+
 extern "C" jint JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env = nullptr;
     if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) return JNI_ERR;
+    exemptHiddenApis(env);
     installHooks();
     return JNI_VERSION_1_6;
 }
