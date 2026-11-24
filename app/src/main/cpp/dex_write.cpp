@@ -776,9 +776,20 @@ namespace dexpack::dex {
                     (i.ref->owner == u"Landroid/content/pm/Signature;" ||
                      (i.ref->owner == u"Ljava/security/MessageDigest;" && i.ref->text == u"digest"))) signature = true;
             }
-            if (!signature) continue;
+            bool detected = false;
             for (const auto& i : m->code->instructions) {
-                if (i.ref && i.ref->kind == Kind::String && hex(i.ref->text) && i.ref->text != replacement) targets.insert(i.ref->text);
+                if (i.ref && i.ref->kind == Kind::String && hex(i.ref->text) && i.ref->text != replacement) {
+                    targets.insert(i.ref->text);
+                    detected = true;
+                }
+            }
+            if (!signature || !detected) continue;
+            for (auto& i : m->code->instructions) {
+                if (i.ref && i.ref->kind == Kind::Method && i.ref->owner == u"Ljava/util/AbstractCollection;" && i.ref->text == u"add") {
+                    i.ref.reset();
+                    i.op = 0;
+                    i.units = {0, 0, 0};
+                }
             }
         }
         for (const auto& target : targets) rename(model, target, replacement);
