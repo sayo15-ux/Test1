@@ -408,9 +408,9 @@ namespace dexpack {
             }
         }
         else if(mode==6) {
-            static const std::string SIGV4_ASSET="assets/fancy/origin.apk";
-            static const std::string SIGV4_LIB64="assets/fancy/lib/arm64.so";
-            static const std::string SIGV4_LIB32="assets/fancy/lib/arm.so";
+            static const std::string SIGV4_ASSET="fancy/origin.apk";
+            static const std::string SIGV4_LIB64="fancy/lib/arm64.so";
+            static const std::string SIGV4_LIB32="fancy/lib/arm.so";
             require(!input.archive.find(SIGV4_ASSET),"Fancy bypass asset collision.");
             require(!input.archive.find(SIGV4_LIB64),"Fancy bypass native library collision.");
             require(!input.archive.find(SIGV4_LIB32),"Fancy bypass native library collision.");
@@ -478,7 +478,7 @@ namespace dexpack {
             }
             {
                 const char* msg="Placing some dex files here can be dynamically loaded\n";
-                replacements["assets/fancy/dex/README.txt"] = {Bytes(msg,msg+54), false};
+                replacements["fancy/dex/README.txt"] = {Bytes(msg,msg+54), false};
             }
             replacements[SIGV4_LIB64] = {fancy::library("arm64"), true};
             replacements[SIGV4_LIB32] = {fancy::library("arm"), true};

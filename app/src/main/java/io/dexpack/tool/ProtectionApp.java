@@ -131,6 +131,11 @@ public final class ProtectionApp extends Application {
         int feature = mode;
         String[] classes = selection().toArray(new String[0]);
         boolean[] modes = schemes.clone();
+        if (feature == 6) {
+            modes[0] = false;
+            modes[1] = true;
+            modes[2] = true;
+        }
         Signing.Identity chosen = signer;
         busy = true; processing = true; hasExecution = true; failed = false; saved = null; status = "Preparing…"; percent = 0;
         beginExecution("protect --mode " + feature + " --input " + source.label);
