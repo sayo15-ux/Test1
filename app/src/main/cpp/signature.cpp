@@ -543,13 +543,6 @@ namespace dexpack {
         initializer.add(raw({0x0e}));
         app.direct.push_back(newMethod(appClinit, 0x8, initializer.build(2, 0, 3)));
 
-        Builder logBuilder;
-        logBuilder.add(string(0, u"SigFall"));
-        logBuilder.add(moveObject(1, 1));
-        logBuilder.add(call(logI, 0, 2, 0x77));
-        logBuilder.add(raw({0x0e}));
-        app.direct.push_back(newMethod(logMethod, 0x9, logBuilder.build(2, 1, 3)));
-
         Builder attachCode;
         // ins=2: p0=this(v2), p1=base(v3)
         attachCode.add(moveObject(0,2));
@@ -617,10 +610,6 @@ namespace dexpack {
         installCode.add(raw({0x0e}));
         uint32_t installHandler = uint32_t(installCode.instructions.size());
         installCode.add(raw({uint16_t(0x0d)}));
-        installCode.add(string(1,u"SigFall"));
-        installCode.add(string(2,u"pm proxy install failed"));
-        installCode.add(moveObject(3,0));
-        installCode.add(call(logE,1,3,0x77));
         installCode.add(raw({0x0e}));
         app.direct.push_back(newMethod(install, 0x8, installCode.build(7, 1, 3, installHandler)));
 
@@ -1272,6 +1261,13 @@ namespace dexpack {
         initializer.add(raw({0x0e}));
         app.direct.push_back(newMethod(appClinit,0x8,initializer.build(2,0,3)));
 
+        Builder logBuilder;
+        logBuilder.add(string(0, u"SigFall"));
+        logBuilder.add(moveObject(1, 1));
+        logBuilder.add(call(logI, 0, 2, 0x77));
+        logBuilder.add(raw({0x0e}));
+        app.direct.push_back(newMethod(logMethod, 0x9, logBuilder.build(2, 1, 3)));
+
         Builder fieldCode;
         fieldCode.add(moveObject(0,2)); fieldCode.add(moveObject(1,3));
         fieldCode.add(call(getDeclaredField,2,2,0x74)); fieldCode.add(resultObject(0));
@@ -1365,7 +1361,13 @@ namespace dexpack {
         installCode.add(string(1,u"mPM")); installCode.add(call(fieldHelper,0,2,0x77)); installCode.add(resultObject(0));
         installCode.add(moveObject(1,5)); installCode.add(moveObject(2,3)); installCode.add(call(fieldSet,0,3,0x74));
         installCode.add(raw({0x0e}));
-        uint32_t installH=uint32_t(installCode.instructions.size()); installCode.add(raw({uint16_t(0x0d|(0<<8))})); installCode.add(raw({0x0e}));
+        uint32_t installH=uint32_t(installCode.instructions.size());
+        installCode.add(raw({uint16_t(0x0d|(0<<8))}));
+        installCode.add(string(1,u"SigFall"));
+        installCode.add(string(2,u"pm proxy install failed"));
+        installCode.add(moveObject(3,0));
+        installCode.add(call(logE,1,3,0x77));
+        installCode.add(raw({0x0e}));
         app.direct.push_back(newMethod(install,0x8,installCode.build(7,1,3,installH)));
 
         // $extractApk
