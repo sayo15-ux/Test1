@@ -303,7 +303,7 @@ final class RuntimeHookDialog extends Dialog {
         }
     }
 
-    private static String message(Exception error) {
+    private static String message(Throwable error) {
         return error.getMessage() == null ? error.getClass().getSimpleName() : error.getMessage();
     }
 }

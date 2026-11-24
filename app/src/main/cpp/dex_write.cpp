@@ -1,4 +1,6 @@
 #include "dex.hpp"
+#include <queue>
+#include <map>
 namespace dexpack::dex {
     struct Index {
         std::array<std::map<Text,Ref>,6> sets;
@@ -191,11 +193,12 @@ namespace dexpack::dex {
                 }
                 positions[c.oldSize]=narrow(pc);
                 bool changed=false;
-                for(auto&i:instructions)if(i.target>=0&&i.op>=0x32&&i.op<=0x3d&&i.width==2) {
+                for(auto&i:instructions)if(i.target>=0) {
                     int64_t delta=int64_t(pos(uint32_t(i.target)))-i.pc;
-                    if(delta<-32768||delta>32767) {
-                        i.width=5;
-                        changed=true;
+                    if(i.op>=0x32&&i.op<=0x3d&&i.width==2) {
+                        if(delta<-32768||delta>32767) { i.width=5; changed=true; }
+                    } else if((i.op==40||i.op==41) && i.width<3) {
+                        if(delta<-32768||delta>32767 || (i.op==40 && (delta<-128||delta>127))) { i.width=3; changed=true; }
                     }
                 }
                 if(!changed)break;
@@ -211,6 +214,7 @@ namespace dexpack::dex {
             for(const auto&i:instructions) {
                 while(units.size()<i.pc)units.push_back(0);
                 auto u=i.units;
+                if(i.op && !i.payload) u[0]=uint16_t((u[0]&0xff00u)|i.op);
                 if(i.op==26||i.op==27) {
                     auto n=idx.id(i.ref);
                     u= {
@@ -226,9 +230,11 @@ namespace dexpack::dex {
                 if(i.target>=0) {
                     int64_t delta=int64_t(pos(uint32_t(i.target)))-i.pc;
                     require(delta>=std::numeric_limits<int32_t>::min()&&delta<=std::numeric_limits<int32_t>::max(),"DEX branch offset overflow.");
-                    if(i.op==40||i.op==41||i.op==42)u= {
-                        42,uint16_t(delta),uint16_t(uint64_t(delta)>>16)
-                    };
+                    if(i.op==40||i.op==41||i.op==42) {
+                        if(i.width==3 || delta<-32768 || delta>32767 || (i.op==40 && (delta<-128||delta>127))) u={42,uint16_t(delta),uint16_t(uint64_t(delta)>>16)};
+                        else if(i.op==40) u={uint16_t(40 | ((uint16_t(uint8_t(int8_t(delta))))<<8))};
+                        else u[1]=uint16_t(delta);
+                    }
                     else if(i.op>=0x32&&i.op<=0x3d) {
                         if(i.width==5) {
                             auto d=int64_t(pos(uint32_t(i.target)))-(i.pc+2);
@@ -242,6 +248,15 @@ namespace dexpack::dex {
                         u[1]=uint16_t(delta);
                         u[2]=uint16_t(uint64_t(delta)>>16);
                     }
+                } else if(i.op==40||i.op==41||i.op==42) {
+                    int64_t delta = i.op==40 ? int8_t(u[0]>>8) : i.op==41 ? int16_t(u.size()>1?u[1]:0) : int32_t((u.size()>2?uint32_t(u[1])|(uint32_t(u[2])<<16):0));
+                    if(i.width==3) u={42,uint16_t(delta),uint16_t(uint64_t(delta)>>16)};
+                    else if(i.op==40) u={uint16_t(40 | ((uint16_t(uint8_t(int8_t(delta))))<<8))};
+                    else { u.resize(2); u[0]=uint16_t((u[0]&0xff00)|i.op); u[1]=uint16_t(delta); }
+                } else if(i.op>=0x32&&i.op<=0x3d) {
+                    int64_t delta = int16_t(u.size()>1?u[1]:0);
+                    if(i.width==5) { auto d=delta-2; u={uint16_t((u[0]&0xff00)|(((i.op-0x32)^1)+0x32)),5,42,uint16_t(d),uint16_t(uint64_t(d)>>16)}; }
+                    else { u.resize(2); u[1]=uint16_t(delta); }
                 }
                 if(i.payload==256||i.payload==512) {
                     auto it=payloadTargets.find(uint32_t(i.oldPc));
@@ -253,7 +268,17 @@ namespace dexpack::dex {
                         u[base+2*j+1]=uint16_t(uint64_t(t)>>16);
                     }
                 }
-                require(u.size()==i.width,"Invalid relocated instruction width.");
+                if(u.size()!=i.width) {
+                    std::string detail="Invalid relocated instruction width: op="+std::to_string(i.op)
+                        +" payload="+std::to_string(i.payload)
+                        +" oldPc="+std::to_string(i.oldPc)
+                        +" pc="+std::to_string(i.pc)
+                        +" width="+std::to_string(i.width)
+                        +" actual="+std::to_string(u.size())
+                        +" target="+std::to_string(i.target)
+                        +" units0="+std::to_string(u.empty()?0:u[0]);
+                    throw std::runtime_error(detail);
+                }
                 boundaries.push_back(i.pc);
                 units.insert(units.end(),u.begin(),u.end());
             }
@@ -275,36 +300,43 @@ namespace dexpack::dex {
             }
             require(tries.size()<=65535,"Too many DEX try ranges.");
             if(c.debug) {
-                Writer w;
-                const auto&d=*c.debug;
-                w.u(d.line).u(narrow(d.params.size()));
-                for(const auto&p:d.params)w.u(idx.opt(Kind::String,p));
-                uint32_t pc=0;
-                if(pos(0)) {
-                    w.u8(1).u(pos(0));
-                    pc=pos(0);
-                }
-                for(const auto&e:d.events) {
-                    if(e.op==1||e.op>=10) {
-                        auto next=debugPos(e.pc);
-                        require(next>=pc,"Invalid DEX debug order.");
-                        if(next!=pc)w.u8(1).u(next-pc);
-                        pc=next;
-                        if(e.op>=10)w.u8(uint32_t(14+e.line));
+                try {
+                    Writer w;
+                    const auto&d=*c.debug;
+                    w.u(d.line).u(narrow(d.params.size()));
+                    for(const auto&p:d.params)w.u(idx.opt(Kind::String,p));
+                    uint32_t pc=0;
+                    if(pos(0)) {
+                        w.u8(1).u(pos(0));
+                        pc=pos(0);
                     }
-                    else {
-                        w.u8(e.op);
-                        if(e.op==2)w.s(e.line);
-                        if(e.op==3||e.op==4) {
-                            w.u(e.reg).u(idx.opt(Kind::String,e.name)).u(idx.opt(Kind::Type,e.type));
-                            if(e.op==4)w.u(idx.opt(Kind::String,e.sig));
+                    for(const auto&e:d.events) {
+                        if(e.op>=10) {
+                            if(e.line)w.u8(2).s(e.line);
                         }
-                        if(e.op==5||e.op==6)w.u(e.reg);
-                        if(e.op==9)w.u(idx.opt(Kind::String,e.file));
+                        if(e.op==1||e.op>=10) {
+                            auto next=debugPos(e.pc);
+                            if(next<pc) { debug.clear(); goto debug_done; }
+                            if(next!=pc)w.u8(1).u(next-pc);
+                            pc=next;
+                        }
+                        else {
+                            w.u8(e.op);
+                            if(e.op==2)w.s(e.line);
+                            if(e.op==3||e.op==4) {
+                                w.u(e.reg).u(idx.opt(Kind::String,e.name)).u(idx.opt(Kind::Type,e.type));
+                                if(e.op==4)w.u(idx.opt(Kind::String,e.sig));
+                            }
+                            if(e.op==5||e.op==6)w.u(e.reg);
+                            if(e.op==9)w.u(idx.opt(Kind::String,e.file));
+                        }
                     }
+                    w.u8(0);
+                    debug=std::move(w.b);
+                } catch(...) {
+                    debug.clear();
                 }
-                w.u8(0);
-                debug=std::move(w.b);
+                debug_done:;
             }
         }
         Bytes bytes(uint32_t debugOffset)const {
@@ -456,7 +488,7 @@ namespace dexpack::dex {
             std::vector<std::shared_ptr<Code>>debugCodes;
             for(const auto&c:codes) {
                 relocated[c.get()]=std::make_unique<Relocated>(*c,index);
-                if(c->debug)debugCodes.push_back(c);
+                if(c->debug&&!relocated[c.get()]->debug.empty())debugCodes.push_back(c);
             }
             std::map<Code*,uint32_t>debugOff,codeOff;
             section(0x2003,debugCodes,[&](const auto&c,uint32_t off) {
@@ -591,9 +623,36 @@ namespace dexpack::dex {
             }
             std::vector<const Class*>sorted;
             for(const auto&c:model.classes)sorted.push_back(&c);
-            std::sort(sorted.begin(),sorted.end(),[&](const Class*a,const Class*b) {
-                return index.id(Kind::Type,a->type)<index.id(Kind::Type,b->type);
-            });
+            {
+                std::map<uint32_t,size_t> byType;
+                for(size_t i=0;i<sorted.size();++i) byType[index.id(Kind::Type,sorted[i]->type)] = i;
+                std::vector<uint32_t> indeg(sorted.size(),0);
+                std::vector<std::vector<size_t>> dependents(sorted.size());
+                for(size_t i=0;i<sorted.size();++i){
+                    auto addDep=[&](const Text& t){
+                        uint32_t tid=index.id(Kind::Type,t);
+                        auto it=byType.find(tid);
+                        if(it==byType.end()||it->second==i) return;
+                        dependents[it->second].push_back(i);
+                        indeg[i]++;
+                    };
+                    if(sorted[i]->super) addDep(*sorted[i]->super);
+                    for(const auto& iface: sorted[i]->interfaces) addDep(iface);
+                }
+                struct Node { uint32_t type; size_t idx; bool operator>(const Node&o) const { return type>o.type; } };
+                std::priority_queue<Node,std::vector<Node>,std::greater<Node>> pq;
+                for(size_t i=0;i<sorted.size();++i) if(indeg[i]==0) pq.push({index.id(Kind::Type,sorted[i]->type),i});
+                std::vector<const Class*> topo; topo.reserve(sorted.size());
+                while(!pq.empty()){
+                    auto n=pq.top(); pq.pop();
+                    topo.push_back(sorted[n.idx]);
+                    for(size_t d:dependents[n.idx]) if(--indeg[d]==0) pq.push({index.id(Kind::Type,sorted[d]->type),d});
+                }
+                if(topo.size()==sorted.size()) sorted=std::move(topo);
+                else std::sort(sorted.begin(),sorted.end(),[&](const Class*a,const Class*b) {
+                    return index.id(Kind::Type,a->type)<index.id(Kind::Type,b->type);
+                });
+            }
             for(size_t i=0;i<sorted.size();++i) {
                 const auto&c=*sorted[i];
                 auto off=offsets[5]+32*i;

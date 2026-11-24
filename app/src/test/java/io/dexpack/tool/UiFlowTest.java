@@ -58,6 +58,15 @@ public class UiFlowTest {
             capture(a.findViewById(android.R.id.content), "home-signature-killer", 360, 694);
         }
     }
+    @Test public void signatureKillV2NeedsNoClassSelection() throws Exception {
+        try (var controller = Robolectric.buildActivity(MainActivity.class).setup()) {
+            MainActivity a = controller.get(); ProtectionApp app = (ProtectionApp) a.getApplication(); fixture(app);
+            tag(a, "feature4").performClick(); settle();
+            assertTrue(app.ready()); assertEquals(4, app.mode);
+            assertEquals(View.GONE, tag(a, "classArea").getVisibility());
+            capture(a.findViewById(android.R.id.content), "home-signature-kill-v2", 360, 694);
+        }
+    }
     @Test public void v1AndV2KeepSeparateSelectionsAndSaveOrCancelCorrectly() throws Exception {
         try (var controller = Robolectric.buildActivity(MainActivity.class).setup()) {
             MainActivity a = controller.get(); ProtectionApp app = (ProtectionApp) a.getApplication(); fixture(app);

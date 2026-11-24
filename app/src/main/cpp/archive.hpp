@@ -23,6 +23,7 @@ namespace dexpack {
     struct Replacement {
         Bytes data;
         bool store=false;
+        bool shareWithSource=false;
     };
     void writeArchive(const Archive& input,const std::string& output,const std::map<std::string,Replacement>&replacements,const std::set<std::string>&remove,const std::function<void()>&cancel={});
     bool signatureEntry(const std::string& name);

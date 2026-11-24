@@ -81,7 +81,7 @@ namespace dexpack::shield {
             std::array<uint8_t,65536> buffer{};
             for (size_t off = 0; off < size;) {
                 size_t n = std::min(buffer.size(), size-off); size_t count = 0;
-                while (count < n) { ssize_t got = read(fd.value, buffer.data()+count, n-count); if (got < 0 && errno == EINTR) continue; if (got <= 0) return false; count += size_t(got); }
+                while (count < n) { size_t want = std::min<size_t>(n-count, buffer.size()); ssize_t got = read(fd.value, buffer.data()+count, want); if (got < 0 && errno == EINTR) continue; if (got <= 0) return false; count += size_t(got); }
                 if (std::memcmp(bytes+off, buffer.data(), n)) return false;
                 off += n;
             }

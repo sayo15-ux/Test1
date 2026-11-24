@@ -98,7 +98,7 @@ namespace dexpack {
         uint64_t cursor=e.dataOffset;
 
         uLong crc=crc32(0L,Z_NULL,0);
-        std::array<uint8_t,65536>buffer{};
+        std::vector<uint8_t> buffer(65536);
         if(e.method==0) {
             size_t off=0;
             while(off<e.size) {
@@ -124,7 +124,7 @@ namespace dexpack {
             uint64_t left=e.compressed;
             size_t written=0;
             int status=Z_OK;
-            std::array<uint8_t,65536>decoded{};
+            std::vector<uint8_t> decoded(65536);
             while(status!=Z_STREAM_END) {
                 if(!z.avail_in&&left) {
                     auto n=size_t(std::min<uint64_t>(left,buffer.size()));
@@ -167,7 +167,7 @@ namespace dexpack {
             &z
         };
         Bytes out;
-        std::array<uint8_t,65536>buffer{};
+        std::vector<uint8_t> buffer(65536);
         size_t off=0;
         int status=Z_OK;
         while(status!=Z_STREAM_END) {
@@ -223,13 +223,18 @@ namespace dexpack {
         require(bool(in),"Cannot reopen APK.");
         uint64_t offset=0;
         std::vector<Bytes>central;
-        std::array<char,1024*1024>buffer{};
+        std::vector<char> buffer(1024*1024);
         auto emit=[&](const Bytes&b) {
             out.write(reinterpret_cast<const char*>(b.data()),std::streamsize(b.size()));
             offset+=b.size();
             require(bool(out),"Cannot write APK; check free space.");
         };
-        auto entry=[&](ZipEntry e,const Bytes*data) {
+        auto addCentral=[&](const ZipEntry&e,uint16_t flags,uint32_t start) {
+            Writer c;
+            c.u32(0x02014b50).u16(20).u16(20).u16(flags).u16(e.method).u16(e.time).u16(e.date).u32(e.crc).u32(e.compressed).u32(e.size).u16(narrow(ascii(e.name).size())).u16(0).u16(0).u16(0).u16(0).u32(e.external).u32(start).bytes(ascii(e.name));
+            central.push_back(std::move(c.b));
+        };
+        auto writeEntry=[&](ZipEntry e,const Bytes*data,uint64_t&dataStart) {
             if(cancel)cancel();
             auto name=ascii(e.name);
             require(name.size()<=65535&&e.size<NONE&&e.compressed<NONE,"APK entry exceeds ZIP format.");
@@ -246,6 +251,7 @@ namespace dexpack {
             auto flags=uint16_t(e.flags&0x800);
             h.u32(0x04034b50).u16(20).u16(flags).u16(e.method).u16(e.time).u16(e.date).u32(e.crc).u32(e.compressed).u32(e.size).u16(narrow(name.size())).u16(extra.size()).bytes(name).bytes(extra.b);
             emit(h.b);
+            dataStart=offset;
             if(data)emit(*data);
             else {
                 in.clear();
@@ -262,13 +268,32 @@ namespace dexpack {
                     left-=n;
                 }
             }
-            Writer c;
-            c.u32(0x02014b50).u16(20).u16(20).u16(flags).u16(e.method).u16(e.time).u16(e.date).u32(e.crc).u32(e.compressed).u32(e.size).u16(narrow(name.size())).u16(0).u16(0).u16(0).u16(0).u32(e.external).u32(start).bytes(name);
-            central.push_back(std::move(c.b));
+            addCentral(e,flags,start);
         };
+        uint64_t sharedBase=0,unused=0;
+        bool shared=false;
+        for(const auto&p:replacements)if(p.second.shareWithSource) {
+            require(!shared,"Only one APK entry can share the source data.");
+            ZipEntry e;
+            e.name=p.first;
+            e.flags=0x800;
+            e.method=p.second.store?0:8;
+            require(e.method==0,"Shared APK source must be stored uncompressed.");
+            e.size=narrow(p.second.data.size());
+            e.crc=crcOf(p.second.data);
+            e.compressed=e.size;
+            writeEntry(e,&p.second.data,sharedBase);
+            shared=true;
+        }
         try {
-            for(const auto&e:input.entries)if(!remove.count(e.name)&&!signatureEntry(e.name)&&!replacements.count(e.name)&&e.name.back()!='/')entry(e,nullptr);
-            for(const auto&p:replacements) {
+            for(const auto&e:input.entries)if(!remove.count(e.name)&&!signatureEntry(e.name)&&!replacements.count(e.name)&&e.name.back()!='/') {
+                if(shared) {
+                    require(uint64_t(sharedBase)+e.offset<NONE,"APK requires ZIP64 offsets.");
+                    addCentral(e,uint16_t(e.flags&0x800),narrow(uint64_t(sharedBase)+e.offset));
+                }
+                else writeEntry(e,nullptr,unused);
+            }
+            for(const auto&p:replacements)if(!p.second.shareWithSource) {
                 ZipEntry e;
                 e.name=p.first;
                 e.flags=0x800;
@@ -278,7 +303,7 @@ namespace dexpack {
                 Bytes packed=p.second.store?Bytes{}:deflateBytes(p.second.data);
                 const auto&data=p.second.store?p.second.data:packed;
                 e.compressed=narrow(data.size());
-                entry(e,&data);
+                writeEntry(e,&data,unused);
             }
             require(central.size()<65535,"Too many APK entries for ZIP32.");
             auto cd=narrow(offset);
@@ -296,4 +321,5 @@ namespace dexpack {
             throw;
         }
     }
+
 }

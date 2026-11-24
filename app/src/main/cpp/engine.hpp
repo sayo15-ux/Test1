@@ -12,5 +12,6 @@ namespace dexpack {
         explicit Input(const std::string&path);
     };
     std::vector<Text> classes(const Input& input);
-    StringReport protect(const Input& input,const std::string& output,int mode,const std::set<Text>& selected,const Progress& progress={},std::optional<int64_t> fixedClock={});
+    void patchFinalMethods(Bytes& bytes,uint32_t classDefOff,const std::set<std::string>& names);
+    StringReport protect(const Input& input,const std::string& output,int mode,const std::set<Text>& selected,const Progress& progress={},std::optional<int64_t> fixedClock={},const SignatureKillV3Options& sigV3={},const SignatureKillV4Options& sigV4={});
 }

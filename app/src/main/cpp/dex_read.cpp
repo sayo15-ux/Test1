@@ -157,6 +157,8 @@ namespace dexpack::dex {
         std::map<uint32_t,AnnParams> paramsMemo;
         std::map<uint32_t,std::shared_ptr<Directory>> directoryMemo;
         std::set<uint32_t> activeOffsets;
+        bool skipDebug=false;
+        bool skipAnnotations=false;
         explicit Parser(const Bytes& input):b(input) {
             validateDex(b);
             model.version=std::string(b.begin()+4,b.begin()+7);
@@ -358,42 +360,46 @@ namespace dexpack::dex {
         std::shared_ptr<Debug> debug(uint32_t off) {
             if(!off)return {};
             if(debugMemo.count(off))return debugMemo[off];
-            Reader r(b,off);
-            auto d=std::make_shared<Debug>();
-            d->line=r.u();
-            auto n=r.count(r.u());
-            for(uint32_t i=0;i<n;++i)d->params.push_back(opt(r,Kind::String));
-            uint32_t pc=0;
-            for(;;) {
-                auto op=r.u8();
-                if(!op)break;
-                DebugEvent e;
-                e.op=op;
-                e.pc=pc;
-                if(op==1) {
-                    uint64_t next=uint64_t(pc)+r.u();
-                    require(next<=NONE,"Debug address overflow.");
-                    pc=uint32_t(next);
+            try {
+                Reader r(b,off);
+                auto d=std::make_shared<Debug>();
+                d->line=r.u();
+                auto n=r.count(r.u());
+                for(uint32_t i=0;i<n;++i)d->params.push_back(opt(r,Kind::String));
+                uint32_t pc=0;
+                for(;;) {
+                    auto op=r.u8();
+                    if(!op)break;
+                    DebugEvent e;
+                    e.op=op;
                     e.pc=pc;
+                    if(op==1) {
+                        uint64_t next=uint64_t(pc)+r.u();
+                        if(next>NONE) return debugMemo[off]={};
+                        pc=uint32_t(next);
+                        e.pc=pc;
+                    }
+                    else if(op==2)e.line=r.s();
+                    else if(op==3||op==4) {
+                        e.reg=r.u();
+                        e.name=opt(r,Kind::String);
+                        e.type=opt(r,Kind::Type);
+                        if(op==4)e.sig=opt(r,Kind::String);
+                    }
+                    else if(op==5||op==6)e.reg=r.u();
+                    else if(op==9)e.file=opt(r,Kind::String);
+                    else if(op>=10) {
+                        pc+=(op-10)/15;
+                        e.pc=pc;
+                        e.line=-4+(op-10)%15;
+                    }
+                    else if(op!=7&&op!=8) return debugMemo[off]={};
+                    d->events.push_back(e);
                 }
-                else if(op==2)e.line=r.s();
-                else if(op==3||op==4) {
-                    e.reg=r.u();
-                    e.name=opt(r,Kind::String);
-                    e.type=opt(r,Kind::Type);
-                    if(op==4)e.sig=opt(r,Kind::String);
-                }
-                else if(op==5||op==6)e.reg=r.u();
-                else if(op==9)e.file=opt(r,Kind::String);
-                else if(op>=10) {
-                    pc+=(op-10)/15;
-                    e.pc=pc;
-                    e.line=-4+(op-10)%15;
-                }
-                else require(op==7||op==8,"Unknown DEX debug opcode.");
-                d->events.push_back(e);
+                return debugMemo[off]=d;
+            } catch(...) {
+                return debugMemo[off]={};
             }
-            return debugMemo[off]=d;
         }
         std::shared_ptr<Code> code(uint32_t off) {
             if(!off)return {};
@@ -451,7 +457,11 @@ namespace dexpack::dex {
             for(auto&i:c->instructions) {
                 bool branch=i.op==40||i.op==41||i.op==42||i.op==38||i.op==43||i.op==44||(i.op>=0x32&&i.op<=0x3d);
                 if(!branch)continue;
-                require(i.target>=0&&i.target<NONE&&starts.count(uint32_t(i.target)),"Invalid DEX branch target.");
+                if(!(i.target>=0&&i.target<NONE&&starts.count(uint32_t(i.target)))) {
+                    std::string detail="Invalid DEX branch target: op="+std::to_string(i.op)+" oldPc="+std::to_string(i.oldPc)+" target="+std::to_string(i.target)+" count="+std::to_string(c->instructions.size());
+                    for(size_t di=0;di<c->instructions.size();++di){ auto& ins=c->instructions[di]; detail+=" ["+std::to_string(di)+"]pc="+std::to_string(ins.oldPc)+" op="+std::to_string(ins.op)+" w="+std::to_string(ins.units.size()); }
+                    throw std::runtime_error(detail);
+                }
                 const auto&p=c->instructions[starts[uint32_t(i.target)]];
                 if(i.op==43||i.op==44) {
                     require(p.payload==(i.op==43?256:512),"Invalid switch payload.");
@@ -508,7 +518,7 @@ namespace dexpack::dex {
                     });
                 }
             }
-            c->debug=debug(debugOff);
+            c->debug=skipDebug?std::shared_ptr<Debug>{}:debug(debugOff);
             return codeMemo[off]=c;
         }
         Model parse() {
@@ -578,7 +588,7 @@ namespace dexpack::dex {
                 auto src=cr.u32();
                 if(src!=NONE)c.source=at(Kind::String,src)->text;
                 auto ann=cr.u32(),cd=cr.u32(),values=cr.u32();
-                c.annotations=directory(ann);
+                c.annotations=skipAnnotations?std::shared_ptr<Directory>{}:directory(ann);
                 if(cd) {
                     Reader r(b,cd);
                     uint32_t counts[4];
@@ -604,7 +614,7 @@ namespace dexpack::dex {
                         }
                     }
                 }
-                if(values) {
+                if(values && !skipAnnotations) {
                     Reader r(b,values);
                     auto vals=array(r,0);
                     require(vals.size()<=c.staticFields.size(),"Invalid static field values.");
@@ -615,8 +625,11 @@ namespace dexpack::dex {
             return std::move(model);
         }
     };
-    Model read(const Bytes& bytes) {
-        return Parser(bytes).parse();
+    Model read(const Bytes& bytes, bool skipDebug, bool skipAnnotations) {
+        Parser p(bytes);
+        p.skipDebug = skipDebug;
+        p.skipAnnotations = skipAnnotations;
+        return p.parse();
     }
     std::vector<Text> classNames(const Bytes& bytes) {
         Parser p(bytes);

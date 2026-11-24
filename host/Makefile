@@ -3,10 +3,14 @@ CXX ?= c++
 CPP := ../app/src/main/cpp
 CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra -Wpedantic
 GENERATED := ../app/build/generated/shield/shield_payloads.cpp
-SOURCES := $(CPP)/bytes.cpp $(CPP)/dex_read.cpp $(CPP)/dex_write.cpp $(CPP)/strings.cpp $(CPP)/signature.cpp $(CPP)/payloads.cpp $(CPP)/shield_stub.cpp $(GENERATED) $(CPP)/archive.cpp $(CPP)/manifest.cpp $(CPP)/engine.cpp main.cpp
+FANCY_GENERATED := ../app/build/generated/fancy/fancy_payloads.cpp
+SOURCES := $(CPP)/bytes.cpp $(CPP)/dex_read.cpp $(CPP)/dex_write.cpp $(CPP)/strings.cpp $(CPP)/signature.cpp $(CPP)/payloads.cpp $(CPP)/shield_stub.cpp $(GENERATED) $(FANCY_GENERATED) $(CPP)/archive.cpp $(CPP)/manifest.cpp $(CPP)/engine.cpp main.cpp
 
 $(GENERATED):
 	cd .. && ./gradlew :app:generateShieldPayloads
+
+$(FANCY_GENERATED):
+	cd .. && ./gradlew :app:generateFancyPayloads
 
 dexpack: $(SOURCES) $(wildcard $(CPP)/*.hpp)
 	$(CXX) $(CXXFLAGS) -I$(CPP) $(SOURCES) -lz -o $@

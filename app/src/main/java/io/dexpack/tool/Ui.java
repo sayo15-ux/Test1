@@ -27,23 +27,39 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 final class Ui {
-    static final int SURFACE = 0xfffff7ff, CARD = 0xffe8e0ec, SELECTED = 0xffe4daef;
-    static final int PURPLE = 0xff6750a4, INK = 0xff1d1b20, MUTED = 0xff625b71;
-    static final int ERROR = 0xffb3261e, LINE = 0xffcac4d0;
+    static boolean dark = true;
+    static int SURFACE, CARD, SELECTED, PURPLE, INK, MUTED, ERROR, LINE, GLOW, TERMINAL_BG, TERMINAL_FG, CARD_STROKE;
     static final PathInterpolator MOTION = new PathInterpolator(.2f, 0, 0, 1);
+    static { palette(); }
     private Ui() { }
+    static void apply(Context c) { dark = c.getSharedPreferences("ui", 0).getBoolean("dark", true); palette(); }
+    static void toggle(Context c) { dark = !dark; c.getSharedPreferences("ui", 0).edit().putBoolean("dark", dark).apply(); palette(); }
+    static void palette() {
+        if (dark) {
+            SURFACE=0xff0b1020; CARD=0xff141b2d; SELECTED=0xff1f2b46; PURPLE=0xff6cf2ff; INK=0xffe8edf7; MUTED=0xff8a93a6;
+            ERROR=0xffff5c7a; LINE=0xff26324a; GLOW=0x336cf2ff; TERMINAL_BG=0xff09101d; TERMINAL_FG=0xff8ff7c8; CARD_STROKE=0xff2b3a59;
+        } else {
+            SURFACE=0xfff4f7fb; CARD=0xffe9eef7; SELECTED=0xffdce7fb; PURPLE=0xff4f6bff; INK=0xff141b2d; MUTED=0xff5f6b7a;
+            ERROR=0xffd83a56; LINE=0xffcfd8e6; GLOW=0x224f6bff; TERMINAL_BG=0xff141b2d; TERMINAL_FG=0xffb7f7c2; CARD_STROKE=0xffc8d5ea;
+        }
+    }
     static int dp(Context c, float value) { return Math.round(value * c.getResources().getDisplayMetrics().density); }
     static GradientDrawable shape(Context c, int color, float radius) {
         GradientDrawable d = new GradientDrawable(); d.setColor(color); d.setCornerRadius(dp(c, radius)); return d;
     }
+    static GradientDrawable cardShape(Context c, float radius) {
+        GradientDrawable d = shape(c, CARD, radius); d.setStroke(dp(c, 1), CARD_STROKE); return d;
+    }
     static void ripple(View view, int color, float radius) {
         Context c = view.getContext();
-        view.setBackground(new RippleDrawable(ColorStateList.valueOf(0x336750a4), shape(c, color, radius), shape(c, Color.WHITE, radius)));
+        int rippleColor = dark ? 0x446cf2ff : 0x334f6bff;
+        view.setBackground(new RippleDrawable(ColorStateList.valueOf(rippleColor), shape(c, color, radius), shape(c, Color.WHITE, radius)));
     }
     static void outline(View view, int color, float radius) {
         Context c = view.getContext(); GradientDrawable border = shape(c, Color.TRANSPARENT, radius);
         border.setStroke(dp(c, 1), color);
-        view.setBackground(new RippleDrawable(ColorStateList.valueOf(0x226750a4), border, shape(c, Color.WHITE, radius)));
+        int rippleColor = dark ? 0x336cf2ff : 0x224f6bff;
+        view.setBackground(new RippleDrawable(ColorStateList.valueOf(rippleColor), border, shape(c, Color.WHITE, radius)));
     }
     static TextView text(Context c, String label, float size, int color, boolean bold) {
         LineText t = new LineText(c); t.setTextSize(size); t.setTextColor(color);
@@ -85,8 +101,11 @@ final class Ui {
     static void systemBars(Window window, View page) {
         if (window == null) return;
         window.setStatusBarColor(SURFACE); window.setNavigationBarColor(SURFACE);
-        int flags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-        flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        int flags = 0;
+        if (!dark) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
         window.getDecorView().setSystemUiVisibility(flags);
         if (Build.VERSION.SDK_INT >= 35) {
             page.setOnApplyWindowInsetsListener((v, i) -> {
@@ -238,6 +257,8 @@ final class Ui {
                     paint.setStyle(Paint.Style.FILL); canvas.drawArc(1, 5, 23, 25, 180, 180, true, paint);
                     paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(1.4f); canvas.drawLine(7, 7, 4, 2, paint); canvas.drawLine(17, 7, 20, 2, paint);
                     paint.setStyle(Paint.Style.FILL); paint.setColor(Color.WHITE); canvas.drawCircle(7, 12, 1, paint); canvas.drawCircle(17, 12, 1, paint); break;
+                case "sun": paint.setStyle(Paint.Style.STROKE); canvas.drawCircle(12,12,4,paint); for(int i=0;i<8;i++){ double a=i*Math.PI/4; float x1=12+(float)Math.cos(a)*7, y1=12+(float)Math.sin(a)*7, x2=12+(float)Math.cos(a)*9.5f, y2=12+(float)Math.sin(a)*9.5f; canvas.drawLine(x1,y1,x2,y2,paint);} break;
+                case "moon": paint.setStyle(Paint.Style.FILL); p.moveTo(15,3); p.cubicTo(10,3,6,7,6,12); p.cubicTo(6,17,10,21,15,21); p.cubicTo(12.5f,21,10.2f,20,8.5f,18.3f); p.cubicTo(11.5f,19,14,18,16,16); p.cubicTo(18,14,18.5f,11,17.5f,8.5f); p.cubicTo(16.8f,6.5f,16,4.5f,15,3); p.close(); canvas.drawPath(p, paint); break;
                 default: canvas.drawCircle(12, 12, 8, paint);
             }
             canvas.restore();

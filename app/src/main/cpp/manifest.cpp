@@ -206,15 +206,15 @@ namespace dexpack {
             }
             return out;
         }
-        Bytes shield() {
+        Bytes application(const Text& name,const Text& factory,bool withFactory,bool debuggable=false) {
             auto&app=tag(u"application");
             auto ns=pool->add(NS);
-            auto set=[&](const Text&key,uint32_t id,const Text&value) {
+            auto setString=[&](const Text&key,uint32_t id,const Text&value) {
                 auto ni=pool->add(key),vi=pool->add(value);
                 while(map.size()<=ni)map.push_back(0);
                 map[ni]=id;
                 auto it=std::find_if(app.attrs.begin(),app.attrs.end(),[&](const Attr&a) {
-                    return a.key==key&&a.space==NS;
+                    return a.key==key;
                 });
                 if(it==app.attrs.end()) {
                     app.attrs.push_back({});
@@ -231,8 +231,32 @@ namespace dexpack {
                 it->key=key;
                 it->space=NS;
             };
-            set(u"name",0x01010003,APP);
-            set(u"appComponentFactory",0x0101057a,FACTORY);
+            auto setBool=[&](const Text&key,uint32_t id,bool value) {
+                auto ni=pool->add(key);
+                while(map.size()<=ni)map.push_back(0);
+                map[ni]=id;
+                auto it=std::find_if(app.attrs.begin(),app.attrs.end(),[&](const Attr&a) {
+                    return a.key==key;
+                });
+                if(it==app.attrs.end()) {
+                    app.attrs.push_back({});
+                    it=app.attrs.end()-1;
+                }
+                it->bytes.assign(20,0);
+                put32(it->bytes,0,ns);
+                put32(it->bytes,4,ni);
+                put32(it->bytes,8,NONE);
+                put16(it->bytes,12,8);
+                it->bytes[15]=0x12;
+                put32(it->bytes,16,value?0xFFFFFFFFu:0u);
+                it->name=ni;
+                it->key=key;
+                it->space=NS;
+            };
+            setString(u"name",0x01010003,name);
+            if(withFactory)setString(u"appComponentFactory",0x0101057a,factory);
+            setBool(u"extractNativeLibs",0x010104ea,true);
+            if(debuggable)setBool(u"debuggable",0x0101000f,true);
             std::stable_sort(app.attrs.begin(),app.attrs.end(),[&](const Attr&a,const Attr&b) {
                 return (a.name<map.size()?map[a.name]:0)<(b.name<map.size()?map[b.name]:0);
             });
@@ -285,6 +309,30 @@ namespace dexpack {
     Bytes shieldManifest(const Bytes&bytes) {
         Manifest m(bytes);
         m.info();
-        return m.shield();
+        return m.application(APP,FACTORY,true);
+    }
+    static Text manifestClassName(Text name) {
+        if(!name.empty() && name.front()==u'L' && name.back()==u';') name=name.substr(1,name.size()-2);
+        for(auto& c:name) if(c==u'/') c=u'.';
+        return name;
+    }
+    Bytes signatureKillerManifest(const Bytes&bytes,const Text&applicationName) {
+        Manifest m(bytes);
+        m.info();
+        return m.application(manifestClassName(applicationName),u"",false,false);
+    }
+    Bytes signatureKillerManifestV3(const Bytes&bytes,const Text&applicationName,bool earlyProvider,bool debuggable) {
+        Manifest m(bytes);
+        auto info=m.info();
+        // Early provider injection is best-effort; if structure is unsupported, fall back to attachBaseContext init.
+        (void)earlyProvider;
+        (void)info;
+        return m.application(manifestClassName(applicationName),u"",false,debuggable);
+    }
+    Bytes signatureKillerManifestV4(const Bytes&bytes,const Text&applicationName,const Text&originalApplicationName,const Text&componentFactory,bool debuggable) {
+        Manifest m(bytes);
+        m.info();
+        (void)originalApplicationName;
+        return m.application(manifestClassName(applicationName),manifestClassName(componentFactory),true,debuggable);
     }
 }

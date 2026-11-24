@@ -131,7 +131,7 @@ final class Storage {
             base = base.substring(0, base.offsetByCodePoints(base.length(), -1));
         }
         String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date());
-        String suffix = mode == 0 ? "-shield-" : mode == 3 ? "-signature-killer-" : "-strings-v" + mode + "-";
+        String suffix = mode == 0 ? "-shield-" : mode == 3 ? "-signature-killer-" : mode == 4 ? "-signature-killer-v2-" : mode == 5 ? "-signature-killer-v3-" : mode == 6 ? "-fancy-bypass-" : "-strings-v" + mode + "-";
         String name = base + suffix + stamp + "-" + UUID.randomUUID().toString().substring(0, 6) + ".apk";
         File parent = input.original == null ? null : input.original.getParentFile();
         if (parent != null && parent.isDirectory() && parent.canWrite()) {

@@ -32,15 +32,17 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
     private TextView title, subtitle, path, count, startLabel, status, output;
     private Ui.Icon clear, next, clearClasses, startIcon;
     private FrameLayout iconBox;
-    private final LinearLayout[] cards = new LinearLayout[4];
-    private final LinearLayout[] copies = new LinearLayout[4];
-    private final Ui.Choice[] choices = new Ui.Choice[4];
+    private final LinearLayout[] cards = new LinearLayout[7];
+    private final LinearLayout[] copies = new LinearLayout[7];
+    private final Ui.Choice[] choices = new Ui.Choice[7];
+    private final TextView[] configButtons = new TextView[7];
     private boolean pendingClasses, pendingBrowse, pendingProcess;
     private int previousMode = -2;
     private ExecutorDialog executor;
     private SigningSettings settings;
     private SignatureTestDialog signatureTest;
     private RuntimeHookDialog runtimeHook;
+    private FancyBypassDialog fancyBypass;
     private final ArrayList<Dialog> dialogs = new ArrayList<>();
 
     void trackDialog(Dialog dialog) { dialogs.add(dialog); dialog.setOnDismissListener(d -> dialogs.remove(dialog)); }
@@ -62,15 +64,19 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         boolean compact = getResources().getConfiguration().screenWidthDp <= 340;
         LinearLayout root = Ui.column(this); root.setBackgroundColor(Ui.SURFACE);
         LinearLayout bar = Ui.row(this); bar.setPadding(Ui.dp(this, 8), Ui.dp(this, 4), Ui.dp(this, 8), Ui.dp(this, 4));
+        Ui.apply(this);
         Ui.Icon menu = Ui.iconButton(this, "menu", Ui.INK, "Open menu"); menu.setTag("menu"); bar.addView(menu, Ui.lp(this, 40, 48)); menu.setOnClickListener(v -> drawer());
         TextView heading = Ui.text(this, "DEX Protection", 22, Ui.INK, false); heading.setSingleLine(); heading.setEllipsize(TextUtils.TruncateAt.END);
-        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(0, -2, 1); hp.leftMargin = Ui.dp(this, 8); bar.addView(heading, hp); root.addView(bar, Ui.lp(this, -1, 64));
+        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(0, -2, 1); hp.leftMargin = Ui.dp(this, 8); bar.addView(heading, hp);
+        Ui.Icon theme = Ui.iconButton(this, Ui.dark ? "sun" : "moon", Ui.PURPLE, "Toggle theme"); theme.setTag("themeToggle"); bar.addView(theme, Ui.lp(this, 40, 48));
+        theme.setOnClickListener(v -> { Ui.toggle(this); recreate(); });
+        root.addView(bar, Ui.lp(this, -1, 64));
         ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true); scroll.setVerticalScrollBarEnabled(false); scroll.setClipToPadding(false); root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         LinearLayout content = Ui.column(this); content.setPadding(Ui.dp(this, compact ? 12 : 16), Ui.dp(this, compact ? 16 : 18), Ui.dp(this, compact ? 12 : 16), Ui.dp(this, compact ? 24 : 28)); scroll.addView(content);
 
-        FrameLayout selection = new FrameLayout(this); selection.setTag("selectionCard"); selection.setBackground(Ui.shape(this, Ui.CARD, 10)); selection.setElevation(Ui.dp(this, 1));
+        FrameLayout selection = new FrameLayout(this); selection.setTag("selectionCard"); selection.setBackground(Ui.cardShape(this, 12)); selection.setElevation(Ui.dp(this, 1));
         selectionCard = Ui.row(this); selectionCard.setTag("selectApk"); selectionCard.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12)); selectionCard.setMinimumHeight(Ui.dp(this, 72)); Ui.ripple(selectionCard, Ui.CARD, 10);
-        iconBox = new FrameLayout(this); iconBox.setBackground(Ui.shape(this, Color.WHITE, 8)); iconBox.setClipToOutline(true); selectionCard.addView(iconBox, Ui.lp(this, 44, 44));
+        iconBox = new FrameLayout(this); iconBox.setBackground(Ui.shape(this, Ui.dark?0xff1d2740:Color.WHITE, 10)); iconBox.setClipToOutline(true); selectionCard.addView(iconBox, Ui.lp(this, 44, 44));
         LinearLayout text = Ui.column(this); title = Ui.text(this, "Select APK", 16, Ui.PURPLE, true); title.setMaxLines(1); title.setEllipsize(TextUtils.TruncateAt.END); text.addView(title);
         subtitle = Ui.text(this, "Not selected", 14, Ui.MUTED, false); subtitle.setMaxLines(1); subtitle.setEllipsize(TextUtils.TruncateAt.END); text.addView(subtitle); Ui.marginTop(subtitle, 8);
         path = Ui.text(this, "", 10, Ui.MUTED, false); Ui.line(path, 13); text.addView(path);
@@ -83,16 +89,20 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         FrameLayout.LayoutParams closeParams = new FrameLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 40), Gravity.END | Gravity.CENTER_VERTICAL); closeParams.rightMargin = Ui.dp(this, 9); selection.addView(closeBox, closeParams);
         selectionCard.setFocusable(true); selectionCard.setOnClickListener(v -> chooseApk()); content.addView(selection, Ui.lp(this, -1, -2));
 
-        String[] labels = {"Apk Shield", "Dex String Encryption V1", "Dex String Encryption V2", "Signature Killer"};
-        String[] descriptions = {"Provides a shell for the APK to protect against decompilation.", "Encrypts strings in DEX files (Version 1).", "Encrypts strings in DEX files (Version 2).", "Removes in-app signature verification checks."};
-        for (int i = 0; i < 4; i++) {
+        String[] labels = {"Apk Shield", "Dex String Encryption V1", "Dex String Encryption V2", "Signature Killer", "Signature Kill v2", "Signature Kill v3", "Signature Kill v4"};
+        String[] descriptions = {"Provides a shell for the APK to protect against decompilation.", "Encrypts strings in DEX files (Version 1).", "Encrypts strings in DEX files (Version 2).", "Removes in-app signature verification checks.", "MT Manager-style PackageManager signature spoofing.", "Transparent signature spoofing with selectable fallback options.", "Fancy-style proxy application/factory signature bypass."};
+        for (int i = 0; i < cards.length; i++) {
             final int feature = i; LinearLayout card = Ui.row(this); cards[i] = card; card.setTag("feature" + i);
             card.setPadding(Ui.dp(this, compact ? 12 : 16), Ui.dp(this, 12), Ui.dp(this, compact ? 12 : 18), Ui.dp(this, 12)); card.setMinimumHeight(Ui.dp(this, 64)); Ui.ripple(card, Ui.CARD, 12); card.setFocusable(true);
             LinearLayout copy = Ui.column(this); copies[i] = copy;
             LinearLayout label = Ui.flow(this); TextView name = Ui.text(this, labels[i], compact ? 13 : 14, Ui.INK, true); name.setLetterSpacing(.45f / (compact ? 13 : 14)); Ui.line(name, 20); label.addView(name);
             if (i != 1) { TextView vip = Ui.badge(this, "VIP", false); vip.setTextSize(10); vip.setLetterSpacing(.01f); vip.setPadding(Ui.dp(this, 6), 0, Ui.dp(this, 6), 0); LinearLayout.LayoutParams vp = Ui.lp(this, -2, -2); vp.leftMargin = Ui.dp(this, 7); label.addView(vip, vp); }
-            copy.addView(label); TextView description = Ui.text(this, descriptions[i], 12, 0xff49454f, false); copy.addView(description); Ui.marginTop(description, 4);
-            card.addView(copy, new LinearLayout.LayoutParams(0, -2, 1)); choices[i] = new Ui.Choice(this);
+            copy.addView(label); TextView description = Ui.text(this, descriptions[i], 12, Ui.MUTED, false); copy.addView(description); Ui.marginTop(description, 4);
+            card.addView(copy, new LinearLayout.LayoutParams(0, -2, 1));
+            TextView config = Ui.text(this, "CONFIG", 10, Ui.PURPLE, true); config.setTag("featureConfig" + i); config.setPadding(Ui.dp(this, 8), Ui.dp(this, 4), Ui.dp(this, 8), Ui.dp(this, 4)); Ui.outline(config, Ui.PURPLE, 12); config.setVisibility(i == 5 || i == 6 ? View.VISIBLE : View.GONE);
+            config.setOnClickListener(v -> { if (feature == 5) openSignatureKillV3(); else openSignatureKillV4(); }); configButtons[i] = config;
+            LinearLayout.LayoutParams cfg = Ui.lp(this, -2, -2); cfg.leftMargin = Ui.dp(this, 8); card.addView(config, cfg);
+            choices[i] = new Ui.Choice(this);
             LinearLayout.LayoutParams cp = Ui.lp(this, 22, 22); cp.leftMargin = Ui.dp(this, compact ? 10 : 16); card.addView(choices[i], cp);
             card.setContentDescription(labels[i]); card.setOnClickListener(v -> {
                 if (!app.busy) { app.mode = app.mode == feature ? -1 : feature; app.saved = null; app.hasExecution = false; app.status = ""; app.failed = false; app.notifyState(); }
@@ -100,7 +110,7 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
             content.addView(card, Ui.lp(this, -1, -2)); Ui.marginTop(card, i == 0 ? 20 : 10);
         }
         classArea = Ui.column(this); classArea.setTag("classArea"); TextView classLabel = Ui.text(this, "", 14, Ui.PURPLE, true); classLabel.setLetterSpacing(.3f / 14); classLabel.setTag("classHeading"); classArea.addView(classLabel);
-        LinearLayout classRow = Ui.row(this); classRow.setBackground(Ui.shape(this, Ui.CARD, 10));
+        LinearLayout classRow = Ui.row(this); classRow.setBackground(Ui.cardShape(this, 12));
         LinearLayout classButton = Ui.row(this); classButton.setTag("selectClasses"); classButton.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12)); Ui.ripple(classButton, Ui.CARD, 10);
         TextView selectLabel = Ui.text(this, "Select classes", 14, Ui.INK, false); selectLabel.setLetterSpacing(.3f / 14); classButton.addView(selectLabel, new LinearLayout.LayoutParams(0, -2, 1));
         count = Ui.text(this, "0 selected", 11, Ui.MUTED, false); Ui.line(count, 16); classButton.addView(count); classButton.setFocusable(true); classButton.setOnClickListener(v -> openClasses()); classRow.addView(classButton, new LinearLayout.LayoutParams(0, -2, 1));
@@ -131,10 +141,10 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
             if (input != null && input.icon != null) { ImageView image = new ImageView(this); image.setImageDrawable(input.icon); image.setScaleType(ImageView.ScaleType.FIT_CENTER); iconBox.addView(image, new FrameLayout.LayoutParams(-1, -1)); }
             else iconBox.addView(new Ui.Icon(this, "android", Ui.MUTED).size(28), new FrameLayout.LayoutParams(-1, -1));
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < cards.length; i++) {
             cards[i].setEnabled(!app.busy); cards[i].setSelected(app.mode == i);
             if (previousMode != app.mode) {
-                Ui.ripple(cards[i], app.mode == i ? Ui.SELECTED : Ui.CARD, 12); choices[i].checked(app.mode == i, previousMode != -2);
+                cards[i].setBackground(Ui.cardShape(this, 12)); Ui.ripple(cards[i], app.mode == i ? Ui.SELECTED : Ui.CARD, 12); choices[i].checked(app.mode == i, previousMode != -2);
                 float alpha = app.mode >= 0 && app.mode != i ? .42f : 1;
                 if (previousMode == -2 || !android.animation.ValueAnimator.areAnimatorsEnabled()) { copies[i].setAlpha(alpha); choices[i].setAlpha(alpha); }
                 else { copies[i].animate().alpha(alpha).setDuration(160).start(); choices[i].animate().alpha(alpha).setDuration(160).start(); }
@@ -145,12 +155,13 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         classArea.setVisibility(needsClasses ? View.VISIBLE : View.GONE);
         ((TextView) classArea.findViewWithTag("classHeading")).setText("Select classes for String Encryption V" + app.mode);
         count.setText(app.selection().size() + " selected"); clearClasses.setVisibility(app.selection().isEmpty() ? View.GONE : View.VISIBLE); clearClasses.setEnabled(!app.busy);
-        boolean ready = app.ready(); start.setEnabled(ready); int foreground = ready ? Color.WHITE : 0xffaaa3ad;
-        startIcon.color(foreground); startLabel.setTextColor(foreground); Ui.ripple(start, ready ? Ui.PURPLE : 0xffe7e0e8, 28); start.setElevation(Ui.dp(this, ready ? 6 : 0));
+        boolean ready = app.ready(); start.setEnabled(ready); int foreground = ready ? (Ui.dark?0xff0b1020:Color.WHITE) : Ui.MUTED;
+        startIcon.color(foreground); startLabel.setTextColor(foreground); Ui.ripple(start, ready ? Ui.PURPLE : Ui.CARD, 28); start.setElevation(Ui.dp(this, ready ? 6 : 0));
         String notice = input != null && !input.metadata[1].isEmpty() ? "Existing " + input.metadata[1] + " apps require the matching signing key." : "";
         String inline = app.hasExecution && !app.failed ? notice : app.status.isEmpty() ? notice : app.status;
-        status.setText(inline); status.setTextColor(app.failed ? Ui.ERROR : inline.equals(notice) ? 0xff755714 : Ui.MUTED); status.setVisibility(inline.isEmpty() ? View.GONE : View.VISIBLE);
+        status.setText(inline); status.setTextColor(app.failed ? Ui.ERROR : inline.equals(notice) ? (Ui.dark?0xffffc857:0xff755714) : Ui.MUTED); status.setVisibility(inline.isEmpty() ? View.GONE : View.VISIBLE);
         output.setVisibility(app.hasExecution ? View.VISIBLE : View.GONE);
+        if (app.processing && app.hasExecution && (executor == null || !executor.isShowing())) showExecutor();
         if (executor != null && executor.isShowing()) executor.update();
         if (app.busy) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (pendingClasses && !app.busy) { pendingClasses = false; if (app.allClasses != null) openClasses(); }
@@ -163,7 +174,7 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         String[] labels = {"Choose from file picker", "Choose from installed apps"};
         for (int i = 0; i < labels.length; i++) {
             final int option = i; LinearLayout row = Ui.row(this); row.setPadding(Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8)); row.setMinimumHeight(Ui.dp(this, 44)); Ui.ripple(row, Color.TRANSPARENT, 4);
-            View radio = new View(this); GradientDrawable border = Ui.shape(this, Color.TRANSPARENT, 11); border.setStroke(Ui.dp(this, 2), 0xff49454f); radio.setBackground(border); row.addView(radio, Ui.lp(this, 22, 22));
+            View radio = new View(this); GradientDrawable border = Ui.shape(this, Color.TRANSPARENT, 11); border.setStroke(Ui.dp(this, 2), Ui.MUTED); radio.setBackground(border); row.addView(radio, Ui.lp(this, 22, 22));
             TextView label = Ui.text(this, labels[i], 16, Ui.INK, false); label.setLetterSpacing(.4f / 16); LinearLayout.LayoutParams lp = Ui.lp(this, -2, -2); lp.leftMargin = Ui.dp(this, 14); row.addView(label, lp); content.addView(row, Ui.lp(this, -1, -2));
             row.setFocusable(true); row.setOnClickListener(v -> { dialog.dismiss(); if (option == 0) browse(); else installedApps(); });
         }
@@ -231,6 +242,38 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         runtimeHook.show();
     }
 
+    private void openFancyBypass() {
+        if (app.busy) {
+            Toast.makeText(this, "Wait for the current operation to finish.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        fancyBypass = new FancyBypassDialog(this, app);
+        fancyBypass.show();
+    }
+
+    private void openSignatureKillV3() {
+        if (app.busy) {
+            Toast.makeText(this, "Wait for the current operation to finish.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new SignatureKillV3Dialog(this, app).show();
+    }
+
+    private void openSignatureKillV4() {
+        if (app.busy) {
+            Toast.makeText(this, "Wait for the current operation to finish.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new SignatureKillV4Dialog(this, app).show();
+    }
+
+    private void openViewer() {
+        if (app.input == null) { chooseApk(); return; }
+        if (app.busy) { Toast.makeText(this, "Wait for the current operation to finish.", Toast.LENGTH_SHORT).show(); return; }
+        File apk = app.input.original != null ? app.input.original : app.input.cached;
+        new ArchiveDexViewer(this, apk).show();
+    }
+
     private void openClasses() {
         if (app.input == null) { chooseApk(); return; }
         if (app.busy) return;
@@ -243,14 +286,14 @@ public final class MainActivity extends Activity implements ProtectionApp.Observ
         LinearLayout content = Ui.column(this); content.setPadding(Ui.dp(this, 12), Ui.dp(this, 28), Ui.dp(this, 12), Ui.dp(this, 28)); frame.addView(content, new FrameLayout.LayoutParams(-1, -1));
         TextView heading = Ui.text(this, "DEX Protection", 22, Ui.INK, false); heading.setPadding(Ui.dp(this, 16), 0, Ui.dp(this, 16), 0); content.addView(heading); Ui.marginTop(heading, 4);
         Ui.Sheet dialog = new Ui.Sheet(this, frame, true);
-        String[] labels = {"Test Signature", "Runtime Hook", "Signing settings"};
-        String[] icons = {"check", "android", "key"};
-        String[] tags = {"drawerSignatureTest", "drawerRuntimeHook", "drawerKeySettings"};
+        String[] labels = {"Test Signature", "Runtime Hook", "Signing settings", "FancyBypass", "APK/DEX Viewer"};
+        String[] icons = {"check", "android", "key", "tools", "folder"};
+        String[] tags = {"drawerSignatureTest", "drawerRuntimeHook", "drawerKeySettings", "drawerFancyBypass", "drawerViewer"};
         for (int i = 0; i < labels.length; i++) {
-            final int item = i; LinearLayout row = Ui.row(this); row.setTag(tags[i]); row.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12)); Ui.ripple(row, i == 2 ? Color.TRANSPARENT : 0xffeaddff, 28);
-            int color = i == 2 ? Ui.MUTED : 0xff21005d; row.addView(new Ui.Icon(this, icons[i], color), Ui.lp(this, 24, 24));
+            final int item = i; boolean secondary = i == 2; LinearLayout row = Ui.row(this); row.setTag(tags[i]); row.setPadding(Ui.dp(this, 16), Ui.dp(this, 12), Ui.dp(this, 16), Ui.dp(this, 12)); Ui.ripple(row, secondary ? Color.TRANSPARENT : Ui.SELECTED, 28);
+            int color = secondary ? Ui.MUTED : Ui.INK; row.addView(new Ui.Icon(this, icons[i], color), Ui.lp(this, 24, 24));
             TextView label = Ui.text(this, labels[i], 14, color, false); Ui.medium(label); LinearLayout.LayoutParams lp = Ui.lp(this, -2, -2); lp.leftMargin = Ui.dp(this, 14); row.addView(label, lp);
-            content.addView(row, Ui.lp(this, -1, 48)); Ui.marginTop(row, i == 0 ? 28 : 0); row.setFocusable(true); row.setOnClickListener(v -> { dialog.dismiss(); if (item == 0) openSignatureTest(); else if (item == 1) openRuntimeHook(); else openKeySettings(false); });
+            content.addView(row, Ui.lp(this, -1, 48)); Ui.marginTop(row, i == 0 ? 28 : 0); row.setFocusable(true); row.setOnClickListener(v -> { dialog.dismiss(); if (item == 0) openSignatureTest(); else if (item == 1) openRuntimeHook(); else if (item == 2) openKeySettings(false); else if (item == 3) openFancyBypass(); else openViewer(); });
         }
         TextView version = Ui.text(this, "Version " + BuildConfig.VERSION_NAME, 12, Ui.MUTED, false); FrameLayout.LayoutParams vp = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START); vp.leftMargin = Ui.dp(this, 28); vp.bottomMargin = Ui.dp(this, 24); frame.addView(version, vp); dialog.show();
     }

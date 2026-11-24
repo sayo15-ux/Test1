@@ -105,7 +105,7 @@ namespace dexpack::dex {
         std::vector<Handle> handles;
         std::vector<std::vector<Value>> callsites;
     };
-    Model read(const Bytes& bytes);
+    Model read(const Bytes& bytes, bool skipDebug = false, bool skipAnnotations = false);
     std::vector<Text> classNames(const Bytes& bytes);
     Bytes write(const Model& model);
     void rename(Model& model, const Text& before, const Text& after);

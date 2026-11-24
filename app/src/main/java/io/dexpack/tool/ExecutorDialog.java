@@ -5,6 +5,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.Selection;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -16,7 +20,7 @@ final class ExecutorDialog {
     private final StepIcon[] icons = new StepIcon[4];
     private final Track[] tracks = new Track[4];
     private final TextView[] percentages = new TextView[4];
-    private final TextView status, path, close;
+    private final TextView status, path, close, log;
     private final LinearLayout content;
     ExecutorDialog(Context c, ProtectionApp app) {
         this.app = app; content = Ui.column(c); content.setPadding(Ui.dp(c, 18), Ui.dp(c, 20), Ui.dp(c, 18), Ui.dp(c, 14));
@@ -30,8 +34,18 @@ final class ExecutorDialog {
             LinearLayout.LayoutParams rp = Ui.lp(c, -1, -2); rp.leftMargin = Ui.dp(c, 36); rp.topMargin = Ui.dp(c, 10); step.addView(progress, rp); content.addView(step, Ui.lp(c, -1, -2)); Ui.marginTop(step, i == 0 ? 14 : 22);
         }
         status = Ui.text(c, "", 16, Ui.PURPLE, false); Ui.medium(status); Ui.line(status, 23); status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE); content.addView(status); Ui.marginTop(status, 20);
-        path = Ui.text(c, "", 12, 0xff605b64, false); Ui.line(path, 17); path.setTextIsSelectable(true); content.addView(path); Ui.marginTop(path, 20);
-        LinearLayout actions = Ui.row(c); actions.setGravity(Gravity.END); close = Ui.button(c, "Close", false); actions.addView(close, Ui.lp(c, -2, 40)); content.addView(actions, Ui.lp(c, -1, -2)); Ui.marginTop(actions, 24);
+        log = Ui.text(c, "$ waiting for output…", 11, Ui.TERMINAL_FG, false); log.setTypeface(Typeface.MONOSPACE); Ui.line(log, 16); log.setBackground(Ui.shape(c, Ui.TERMINAL_BG, 8)); log.setPadding(Ui.dp(c, 12), Ui.dp(c, 10), Ui.dp(c, 12), Ui.dp(c, 10)); log.setMinHeight(Ui.dp(c, 110)); log.setMaxLines(9); log.setTextIsSelectable(true); log.setMovementMethod(new ScrollingMovementMethod()); log.setTag("executorLog"); log.setOnTouchListener((v, event) -> { v.getParent().requestDisallowInterceptTouchEvent(true); return false; }); content.addView(log, Ui.lp(c, -1, -2)); Ui.marginTop(log, 12);
+        path = Ui.text(c, "", 12, Ui.MUTED, false); Ui.line(path, 17); path.setTextIsSelectable(true); content.addView(path); Ui.marginTop(path, 20);
+        LinearLayout actions = Ui.row(c); actions.setGravity(Gravity.END);
+        TextView copy = Ui.button(c, "Copy Log", false); copy.setTag("copyLog");
+        copy.setOnClickListener(v -> {
+            android.content.ClipboardManager cm = (android.content.ClipboardManager) c.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm != null) { cm.setPrimaryClip(android.content.ClipData.newPlainText("DexPack log", log.getText().toString())); android.widget.Toast.makeText(c, "Log copied", android.widget.Toast.LENGTH_SHORT).show(); }
+        });
+        actions.addView(copy, Ui.lp(c, -2, 40));
+        close = Ui.button(c, "Close", false);
+        LinearLayout.LayoutParams closeLp = Ui.lp(c, -2, 40); closeLp.leftMargin = Ui.dp(c, 8); actions.addView(close, closeLp);
+        content.addView(actions, Ui.lp(c, -1, -2)); Ui.marginTop(actions, 24);
         dialog = new Ui.Sheet(c, content, false); close.setOnClickListener(v -> dialog.dismiss());
     }
     void show() { dialog.show(); }
@@ -48,9 +62,24 @@ final class ExecutorDialog {
         }
         boolean finished = app.saved != null;
         status.setText(finished ? "Processing completed" : app.status); status.setTextColor(app.failed ? Ui.ERROR : Ui.PURPLE); status.setTextSize(app.failed ? 14 : 16); Ui.line(status, app.failed ? 20 : 23);
+        renderLog();
         path.setText(finished ? app.saved.path : ""); path.setVisibility(finished ? View.VISIBLE : View.GONE);
         close.setEnabled(!app.processing); close.setAlpha(app.processing ? .4f : 1); dialog.setCancelable(!app.processing); dialog.setCanceledOnTouchOutside(!app.processing);
     }
+    private void renderLog() {
+        StringBuilder builder = new StringBuilder();
+        for (String line : app.log) {
+            if (builder.length() > 0) builder.append('\n');
+            builder.append(line);
+        }
+        String value = builder.length() == 0 ? "$ waiting for output…" : builder.toString();
+        if (!value.equals(log.getText().toString())) {
+            SpannableString text = new SpannableString(value);
+            Selection.setSelection(text, text.length());
+            log.setText(text);
+        }
+    }
+
     private static final class Track extends View {
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         float amount; ValueAnimator animator;
