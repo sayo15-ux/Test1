@@ -1493,6 +1493,8 @@ namespace dexpack {
         invokeCode.add(string(3,u"getPackageInfo"));
         invokeCode.add(call(stringEquals,3,2,0x74)); invokeCode.add(resultInt(3));
         uint32_t bNotPkg=uint32_t(invokeCode.instructions.size()); invokeCode.add(raw({uint16_t(0x38|(3<<8)),0}));
+        invokeCode.add(string(0,u"getPackageInfo intercepted"));
+        invokeCode.add(call(logMethod,0,1,0x77));
         invokeCode.add(moveObject(0,1)); invokeCode.add(moveObject(2,6)); invokeCode.add(moveObject(3,7));
         invokeCode.add(call(methodInvoke,0,3,0x74)); invokeCode.add(resultObject(0));
         invokeCode.add(typeOp(0x1f,0,PACKAGE_INFO)); invokeCode.add(call(patchPackage,0,1,0x77));
