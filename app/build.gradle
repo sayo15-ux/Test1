@@ -128,35 +128,17 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
     }
 }
 
-def fancySource = file('src/main/cpp/fancy_bypass.cpp')
-def fancyProject = file('src/main/cpp/fancybypass')
-def fancyLibs = layout.buildDirectory.dir('intermediates/fancy/libs')
-def fancyObj = layout.buildDirectory.dir('intermediates/fancy/obj')
+def fancyRefDir = file('src/main/cpp/fancybypass_ref')
 def fancyOutput = layout.buildDirectory.dir('generated/fancy')
 def generateFancyPayloads = tasks.register('generateFancyPayloads') {
-    inputs.file(fancySource)
-    inputs.file(new File(fancyProject, 'Android.mk'))
-    inputs.file(new File(fancyProject, 'Application.mk'))
+    inputs.file(new File(fancyRefDir, 'arm.so'))
+    inputs.file(new File(fancyRefDir, 'arm64.so'))
     outputs.file(fancyOutput.map { it.file('fancy_payloads.cpp') })
     doLast {
-        File libs = fancyLibs.get().asFile
-        delete libs
-        exec {
-            environment 'ANDROID_NDK_HOME', android.ndkDirectory.absolutePath
-            environment 'ANDROID_NDK_ROOT', android.ndkDirectory.absolutePath
-            executable new File(android.ndkDirectory, 'ndk-build')
-            args "NDK_PROJECT_PATH=${fancyProject.absolutePath}",
-                    "NDK_APPLICATION_MK=${new File(fancyProject, 'Application.mk').absolutePath}",
-                    "APP_BUILD_SCRIPT=${new File(fancyProject, 'Android.mk').absolutePath}",
-                    "APP_PLATFORM=android-26",
-                    "NDK_LIBS_OUT=${libs.absolutePath}",
-                    "NDK_OUT=${fancyObj.get().asFile.absolutePath}",
-                    '-j1'
-        }
         def payloads = [:]
-        ['armeabi-v7a': 'arm', 'arm64-v8a': 'arm64'].each { abi, name ->
-            File library = new File(libs, "${abi}/libfancy-bypass.so")
-            if (!library.exists()) throw new GradleException("Fancy native library missing: ${library}")
+        ['arm': 'arm.so', 'arm64': 'arm64.so'].each { name, fileName ->
+            File library = new File(fancyRefDir, fileName)
+            if (!library.exists()) throw new GradleException("Fancy reference library missing: ${library}")
             payloads[name] = library.bytes
         }
         File output = fancyOutput.get().asFile
