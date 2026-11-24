@@ -543,6 +543,13 @@ namespace dexpack {
         initializer.add(raw({0x0e}));
         app.direct.push_back(newMethod(appClinit, 0x8, initializer.build(2, 0, 3)));
 
+        Builder logBuilder;
+        logBuilder.add(string(0, u"SigFall"));
+        logBuilder.add(moveObject(1, 1));
+        logBuilder.add(call(logI, 0, 2, 0x77));
+        logBuilder.add(raw({0x0e}));
+        app.direct.push_back(newMethod(logMethod, 0x9, logBuilder.build(2, 1, 3)));
+
         Builder attachCode;
         // ins=2: p0=this(v2), p1=base(v3)
         attachCode.add(moveObject(0,2));
@@ -610,6 +617,10 @@ namespace dexpack {
         installCode.add(raw({0x0e}));
         uint32_t installHandler = uint32_t(installCode.instructions.size());
         installCode.add(raw({uint16_t(0x0d)}));
+        installCode.add(string(1,u"SigFall"));
+        installCode.add(string(2,u"pm proxy install failed"));
+        installCode.add(moveObject(3,0));
+        installCode.add(call(logE,1,3,0x77));
         installCode.add(raw({0x0e}));
         app.direct.push_back(newMethod(install, 0x8, installCode.build(7, 1, 3, installHandler)));
 
@@ -1227,6 +1238,9 @@ namespace dexpack {
         Ref outputClose = method(u"Ljava/io/FileOutputStream;", u"close", u"V");
         Ref classGetDeclaredMethod = method(OBJECT_CLASS, u"getDeclaredMethod", METHOD, {STRING, u"[Ljava/lang/Class;"});
         Ref loadNative = method(proxy, u"$loadNative", STRING, {CONTEXT});
+        Ref logI = method(u"Landroid/util/Log;", u"i", u"I", {STRING, STRING});
+        Ref logE = method(u"Landroid/util/Log;", u"e", u"I", {STRING, STRING, u"Ljava/lang/Throwable;"});
+        Ref logMethod = method(proxy, u"$log", u"V", {STRING});
 
         Ref appInit = method(proxy, u"<init>", u"V");
         Ref appClinit = method(proxy, u"<clinit>", u"V");
@@ -1444,7 +1458,11 @@ namespace dexpack {
         if (doEmbed) { attachCode.add(call(extractApk,0,1,0x77)); attachCode.add(resultObject(2)); attachCode.add(moveObject(0,9)); attachCode.add(moveObject(1,10)); }
         attachCode.add(moveObject(0,9));
         attachCode.add(call(loadNative,0,1,0x77)); attachCode.add(resultObject(0));
-        if (cfg.pmProxy) { attachCode.add(moveObject(0,9)); attachCode.add(call(install,0,1,0x77)); }
+        if (cfg.pmProxy) {
+            attachCode.add(moveObject(0,9)); attachCode.add(call(install,0,1,0x77));
+            attachCode.add(string(0,u"pm proxy installed"));
+            attachCode.add(call(logMethod,0,1,0x77));
+        }
         attachCode.add(moveObject(0,9)); attachCode.add(moveObject(1,10));
         attachCode.add(call(superAttach,0,2,0x75));
         attachCode.add(raw({0x0e}));
