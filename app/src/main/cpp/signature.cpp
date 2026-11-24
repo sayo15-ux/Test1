@@ -1442,13 +1442,11 @@ namespace dexpack {
         // ins=2: this=v9, base=v10 (regs=11)
         attachCode.add(moveObject(0,9)); attachCode.add(moveObject(1,10));
         if (doEmbed) { attachCode.add(call(extractApk,0,1,0x77)); attachCode.add(resultObject(2)); attachCode.add(moveObject(0,9)); attachCode.add(moveObject(1,10)); }
+        attachCode.add(moveObject(0,9));
+        attachCode.add(call(loadNative,0,1,0x77)); attachCode.add(resultObject(0));
+        if (cfg.pmProxy) { attachCode.add(moveObject(0,9)); attachCode.add(call(install,0,1,0x77)); }
         attachCode.add(moveObject(0,9)); attachCode.add(moveObject(1,10));
         attachCode.add(call(superAttach,0,2,0x75));
-        {
-            attachCode.add(moveObject(0,9));
-            attachCode.add(call(loadNative,0,1,0x77)); attachCode.add(resultObject(0));
-        }
-        if (cfg.pmProxy) { attachCode.add(moveObject(0,9)); attachCode.add(call(install,0,1,0x77)); }
         attachCode.add(raw({0x0e}));
         uint32_t attachH=uint32_t(attachCode.instructions.size()); attachCode.add(raw({uint16_t(0x0d|(0<<8))})); attachCode.add(raw({0x0e}));
         app.virtuals.push_back(newMethod(attach,0x1,attachCode.build(11,2,4,attachH)));
