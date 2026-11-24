@@ -11,6 +11,8 @@
 #include <string>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <set>
+#include <elf.h>
 #include <sys/syscall.h>
 #include <sys/system_properties.h>
 #include <unistd.h>
@@ -20,8 +22,6 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 namespace {
-
-pthread_once_t g_once = PTHREAD_ONCE_INIT;
 
 const char* const kHidden[] = {
     "origin.apk", "libfancy-bypass", "fancy/lib", "fancy/dex", "fancy_origin"
@@ -91,68 +91,6 @@ AccessFn g_access = nullptr;
 StatFn g_stat = nullptr;
 FstatatFn g_fstatat = nullptr;
 
-void* g_openStub = nullptr;
-void* g_openatStub = nullptr;
-void* g_fopenStub = nullptr;
-void* g_accessStub = nullptr;
-void* g_statStub = nullptr;
-void* g_fstatatStub = nullptr;
-
-void* allocExec(size_t size) {
-    void* memory = mmap(nullptr, size, PROT_READ | PROT_WRITE | PROT_EXEC,
-                        MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    return memory == MAP_FAILED ? nullptr : memory;
-}
-
-void patchFunction(void* target, void* stub, void* replacement, size_t originalBytes) {
-    if (!target || !stub || !replacement) return;
-    long pageSize = sysconf(_SC_PAGESIZE);
-    if (pageSize <= 0) pageSize = 4096;
-    uintptr_t page = (uintptr_t)target & ~(uintptr_t)(pageSize - 1);
-    if (mprotect((void*)page, (size_t)pageSize * 2, PROT_READ | PROT_WRITE | PROT_EXEC) != 0) {
-        LOGE("mprotect failed");
-        return;
-    }
-    memcpy(stub, target, originalBytes);
-#if defined(__aarch64__)
-    uint8_t* code = (uint8_t*)stub + originalBytes;
-    code[0] = 0x50; code[1] = 0x00; code[2] = 0x00; code[3] = 0x58;
-    code[4] = 0x00; code[5] = 0x00; code[6] = 0x1f; code[7] = 0xd6;
-    uint64_t next = (uint64_t)((uint8_t*)target + originalBytes);
-    memcpy(code + 8, &next, sizeof(next));
-    __builtin___clear_cache((char*)stub, (char*)stub + originalBytes + 16);
-    uint8_t patch[16];
-    patch[0] = 0x50; patch[1] = 0x00; patch[2] = 0x00; patch[3] = 0x58;
-    patch[4] = 0x00; patch[5] = 0x00; patch[6] = 0x1f; patch[7] = 0xd6;
-    uint64_t hook = (uint64_t)replacement;
-    memcpy(patch + 8, &hook, sizeof(hook));
-    memcpy(target, patch, sizeof(patch));
-#else
-    uint8_t* code = (uint8_t*)stub + originalBytes;
-    code[0] = 0x04; code[1] = 0xf0; code[2] = 0x1f; code[3] = 0xe5;
-    uint32_t next = (uint32_t)((uint8_t*)target + originalBytes);
-    memcpy(code + 4, &next, sizeof(next));
-    __builtin___clear_cache((char*)stub, (char*)stub + originalBytes + 8);
-    uint8_t patch[8];
-    patch[0] = 0x04; patch[1] = 0xf0; patch[2] = 0x1f; patch[3] = 0xe5;
-    uint32_t hook = (uint32_t)replacement;
-    memcpy(patch + 4, &hook, sizeof(hook));
-    memcpy(target, patch, sizeof(patch));
-#endif
-    __builtin___clear_cache((char*)target, (char*)target + originalBytes);
-    mprotect((void*)page, (size_t)pageSize * 2, PROT_READ | PROT_EXEC);
-}
-
-template <typename Fn>
-void hook(Fn& original, void* replacement, void*& stub, size_t bytes, const char* name) {
-    void* target = dlsym(RTLD_DEFAULT, name);
-    if (!target) { LOGE("dlsym %s failed", name); return; }
-    stub = allocExec(bytes + 32);
-    if (!stub) { LOGE("allocExec failed for %s", name); return; }
-    patchFunction(target, stub, replacement, bytes);
-    original = reinterpret_cast<Fn>(stub);
-}
-
 int hookedOpen(const char* path, int flags, ...) {
     mode_t mode = 0;
     if (flags & O_CREAT) {
@@ -200,26 +138,196 @@ int hookedFstatat(int dirfd, const char* path, struct stat* info, int flags) {
     return g_fstatat ? g_fstatat(dirfd, path, info, flags) : -1;
 }
 
-void installHooks() {
-#if defined(__aarch64__)
-    constexpr size_t kBytes = 16;
-#else
-    constexpr size_t kBytes = 8;
-#endif
-    hook(g_open, (void*)hookedOpen, g_openStub, kBytes, "open");
-    hook(g_openat, (void*)hookedOpenat, g_openatStub, kBytes, "openat");
-    hook(g_fopen, (void*)hookedFopen, g_fopenStub, kBytes, "fopen");
-    hook(g_access, (void*)hookedAccess, g_accessStub, kBytes, "access");
-    hook(g_stat, (void*)hookedStat, g_statStub, kBytes, "stat");
-    hook(g_fstatat, (void*)hookedFstatat, g_fstatatStub, kBytes, "fstatat");
-    LOGI("native bypass hooks installed");
+struct HookRecord {
+    const char* name;
+    void* replacement;
+};
+
+static const HookRecord kHooks[] = {
+    {"open", (void*)hookedOpen},
+    {"openat", (void*)hookedOpenat},
+    {"fopen", (void*)hookedFopen},
+    {"access", (void*)hookedAccess},
+    {"stat", (void*)hookedStat},
+    {"fstatat", (void*)hookedFstatat},
+};
+
+void writeSlot(uintptr_t slot, void* value) {
+    long pageSize = sysconf(_SC_PAGESIZE);
+    if (pageSize <= 0) pageSize = 4096;
+    uintptr_t page = slot & ~((uintptr_t)pageSize - 1);
+    if (mprotect((void*)page, (size_t)pageSize, PROT_READ | PROT_WRITE) != 0) {
+        if (mprotect((void*)page, (size_t)pageSize * 2, PROT_READ | PROT_WRITE) != 0) return;
+    }
+    *(void**)slot = value;
 }
 
+void patchSlotForName(const char* name, uintptr_t slot) {
+    for (const auto& hook : kHooks) {
+        if (strcmp(name, hook.name) == 0) {
+            writeSlot(slot, hook.replacement);
+            return;
+        }
+    }
+}
+
+void patchLibrary64(uintptr_t start) {
+    Elf64_Ehdr* header = (Elf64_Ehdr*)start;
+    if (memcmp(header->e_ident, ELFMAG, SELFMAG) != 0) return;
+    Elf64_Phdr* phdr = (Elf64_Phdr*)(start + header->e_phoff);
+    uintptr_t bias = start;
+    uintptr_t dynamic = 0;
+    for (int i = 0; i < header->e_phnum; ++i) {
+        if (phdr[i].p_type == PT_LOAD && phdr[i].p_offset == 0) {
+            bias = start - phdr[i].p_vaddr;
+            break;
+        }
+    }
+    for (int i = 0; i < header->e_phnum; ++i) {
+        if (phdr[i].p_type == PT_DYNAMIC) {
+            dynamic = bias + phdr[i].p_vaddr;
+            break;
+        }
+    }
+    if (!dynamic) return;
+    uintptr_t strtab = 0, symtab = 0, jmprel = 0;
+    size_t pltrelsz = 0, syment = sizeof(Elf64_Sym);
+    for (Elf64_Dyn* dyn = (Elf64_Dyn*)dynamic; dyn->d_tag != DT_NULL; ++dyn) {
+        switch (dyn->d_tag) {
+            case DT_STRTAB: strtab = bias + dyn->d_un.d_ptr; break;
+            case DT_SYMTAB: symtab = bias + dyn->d_un.d_ptr; break;
+            case DT_JMPREL: jmprel = bias + dyn->d_un.d_ptr; break;
+            case DT_PLTRELSZ: pltrelsz = (size_t)dyn->d_un.d_val; break;
+            case DT_SYMENT: syment = (size_t)dyn->d_un.d_val; break;
+            default: break;
+        }
+    }
+    if (!strtab || !symtab || !jmprel || !pltrelsz) return;
+    Elf64_Rela* rela = (Elf64_Rela*)jmprel;
+    for (size_t i = 0; i < pltrelsz / sizeof(Elf64_Rela); ++i) {
+        uint32_t type = (uint32_t)ELF64_R_TYPE(rela[i].r_info);
+        if (type != R_AARCH64_JUMP_SLOT && type != R_AARCH64_GLOB_DAT) continue;
+        uint32_t index = (uint32_t)ELF64_R_SYM(rela[i].r_info);
+        Elf64_Sym* symbol = (Elf64_Sym*)(symtab + index * syment);
+        const char* name = (const char*)(strtab + symbol->st_name);
+        patchSlotForName(name, bias + rela[i].r_offset);
+    }
+}
+
+void patchLibrary32(uintptr_t start) {
+    Elf32_Ehdr* header = (Elf32_Ehdr*)start;
+    if (memcmp(header->e_ident, ELFMAG, SELFMAG) != 0) return;
+    Elf32_Phdr* phdr = (Elf32_Phdr*)(start + header->e_phoff);
+    uintptr_t bias = start;
+    uintptr_t dynamic = 0;
+    for (int i = 0; i < header->e_phnum; ++i) {
+        if (phdr[i].p_type == PT_LOAD && phdr[i].p_offset == 0) {
+            bias = start - phdr[i].p_vaddr;
+            break;
+        }
+    }
+    for (int i = 0; i < header->e_phnum; ++i) {
+        if (phdr[i].p_type == PT_DYNAMIC) {
+            dynamic = bias + phdr[i].p_vaddr;
+            break;
+        }
+    }
+    if (!dynamic) return;
+    uintptr_t strtab = 0, symtab = 0, jmprel = 0;
+    size_t pltrelsz = 0, syment = sizeof(Elf32_Sym);
+    for (Elf32_Dyn* dyn = (Elf32_Dyn*)dynamic; dyn->d_tag != DT_NULL; ++dyn) {
+        switch (dyn->d_tag) {
+            case DT_STRTAB: strtab = bias + dyn->d_un.d_ptr; break;
+            case DT_SYMTAB: symtab = bias + dyn->d_un.d_ptr; break;
+            case DT_JMPREL: jmprel = bias + dyn->d_un.d_ptr; break;
+            case DT_PLTRELSZ: pltrelsz = (size_t)dyn->d_un.d_val; break;
+            case DT_SYMENT: syment = (size_t)dyn->d_un.d_val; break;
+            default: break;
+        }
+    }
+    if (!strtab || !symtab || !jmprel || !pltrelsz) return;
+    Elf32_Rel* rel = (Elf32_Rel*)jmprel;
+    for (size_t i = 0; i < pltrelsz / sizeof(Elf32_Rel); ++i) {
+        uint32_t type = ELF32_R_TYPE(rel[i].r_info);
+        if (type != R_ARM_JUMP_SLOT && type != R_ARM_GLOB_DAT) continue;
+        uint32_t index = ELF32_R_SYM(rel[i].r_info);
+        Elf32_Sym* symbol = (Elf32_Sym*)(symtab + index * syment);
+        const char* name = (const char*)(strtab + symbol->st_name);
+        patchSlotForName(name, bias + rel[i].r_offset);
+    }
+}
+
+bool skipLibrary(const char* path) {
+    return strstr(path, "libc.so") || strstr(path, "linker") ||
+           strstr(path, "libfancy-bypass") || !strstr(path, ".so");
+}
+
+void patchLibraries() {
+    int fd = (int)syscall(__NR_openat, AT_FDCWD, "/proc/self/maps", O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return;
+    std::string content;
+    char buffer[8192];
+    for (;;) {
+        long n = syscall(__NR_read, fd, buffer, sizeof(buffer));
+        if (n < 0) { syscall(__NR_close, fd); return; }
+        if (n == 0) break;
+        content.append(buffer, (size_t)n);
+    }
+    syscall(__NR_close, fd);
+    std::set<std::string> seen;
+    size_t start = 0;
+    while (start < content.size()) {
+        size_t end = content.find('\n', start);
+        if (end == std::string::npos) end = content.size();
+        std::string line = content.substr(start, end - start);
+        unsigned long begin = 0, offset = 0;
+        char perms[16] = {0}, dev[64] = {0};
+        unsigned long inode = 0;
+        int consumed = 0;
+        if (sscanf(line.c_str(), "%lx-%lx %15s %lx %63s %lu %n",
+                   &begin, &end, perms, &offset, dev, &inode, &consumed) >= 6 && consumed > 0) {
+            std::string path = line.substr((size_t)consumed);
+            size_t first = path.find_first_not_of(" \t");
+            if (first != std::string::npos) path = path.substr(first);
+            if (!path.empty() && offset == 0 && !skipLibrary(path.c_str()) && seen.insert(path).second) {
+                uintptr_t base = (uintptr_t)begin;
+                Elf64_Ehdr* header = (Elf64_Ehdr*)base;
+                if (memcmp(header->e_ident, ELFMAG, SELFMAG) == 0) {
+                    if (header->e_ident[EI_CLASS] == ELFCLASS64) patchLibrary64(base);
+                    else if (header->e_ident[EI_CLASS] == ELFCLASS32) patchLibrary32(base);
+                }
+            }
+        }
+        start = end + 1;
+    }
+}
+
+void* patchThread(void*) {
+    for (;;) {
+        patchLibraries();
+        usleep(50000);
+    }
+    return nullptr;
+}
+
+void installHooks() {
+    g_open = (OpenFn)dlsym(RTLD_DEFAULT, "open");
+    g_openat = (OpenatFn)dlsym(RTLD_DEFAULT, "openat");
+    g_fopen = (FopenFn)dlsym(RTLD_DEFAULT, "fopen");
+    g_access = (AccessFn)dlsym(RTLD_DEFAULT, "access");
+    g_stat = (StatFn)dlsym(RTLD_DEFAULT, "stat");
+    g_fstatat = (FstatatFn)dlsym(RTLD_DEFAULT, "fstatat");
+    pthread_t thread;
+    if (pthread_create(&thread, nullptr, patchThread, nullptr) == 0) {
+        pthread_detach(thread);
+    }
+    LOGI("native bypass hooks installed via GOT patching");
+}
 }  // namespace
 
 extern "C" jint JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env = nullptr;
     if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) return JNI_ERR;
-    // Inline hooks disabled: raw byte patching breaks PC-relative instructions and caused SIGSEGV.
+    installHooks();
     return JNI_VERSION_1_6;
 }
