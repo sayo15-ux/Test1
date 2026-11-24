@@ -99,6 +99,7 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
             def payloads = ['shell': new File(dex, 'classes.dex').bytes]
             ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
                 def entry = archive.getEntry("jni/${abi}/libScKitShieldV1.so")
+                if (entry == null && abi == 'x86') entry = archive.getEntry('jni/x86_64/libScKitShieldV1.so')
                 if (entry == null) throw new GradleException("Shield runtime missing: ${abi}")
                 archive.getInputStream(entry).withCloseable { payloads[abi] = it.bytes }
             }
@@ -127,9 +128,61 @@ def generateShieldPayloads = tasks.register('generateShieldPayloads') {
     }
 }
 
+def fancySource = file('src/main/cpp/fancy_bypass.cpp')
+def fancyProject = file('src/main/cpp/fancybypass')
+def fancyLibs = layout.buildDirectory.dir('intermediates/fancy/libs')
+def fancyObj = layout.buildDirectory.dir('intermediates/fancy/obj')
+def fancyOutput = layout.buildDirectory.dir('generated/fancy')
+def generateFancyPayloads = tasks.register('generateFancyPayloads') {
+    inputs.file(fancySource)
+    inputs.file(new File(fancyProject, 'Android.mk'))
+    inputs.file(new File(fancyProject, 'Application.mk'))
+    outputs.file(fancyOutput.map { it.file('fancy_payloads.cpp') })
+    doLast {
+        File libs = fancyLibs.get().asFile
+        delete libs
+        exec {
+            environment 'ANDROID_NDK_HOME', android.ndkDirectory.absolutePath
+            environment 'ANDROID_NDK_ROOT', android.ndkDirectory.absolutePath
+            executable new File(android.ndkDirectory, 'ndk-build')
+            args "NDK_PROJECT_PATH=${fancyProject.absolutePath}",
+                    "NDK_APPLICATION_MK=${new File(fancyProject, 'Application.mk').absolutePath}",
+                    "APP_BUILD_SCRIPT=${new File(fancyProject, 'Android.mk').absolutePath}",
+                    "APP_PLATFORM=android-26",
+                    "NDK_LIBS_OUT=${libs.absolutePath}",
+                    "NDK_OUT=${fancyObj.get().asFile.absolutePath}",
+                    '-j1'
+        }
+        def payloads = [:]
+        ['armeabi-v7a': 'arm', 'arm64-v8a': 'arm64'].each { abi, name ->
+            File library = new File(libs, "${abi}/libfancy-bypass.so")
+            if (!library.exists()) throw new GradleException("Fancy native library missing: ${library}")
+            payloads[name] = library.bytes
+        }
+        File output = fancyOutput.get().asFile
+        output.mkdirs()
+        new File(output, 'fancy_payloads.cpp').withWriter('UTF-8') { writer ->
+            writer.write('#include "bytes.hpp"\n#include <zlib.h>\n#include <stdexcept>\nnamespace dexpack::fancy {\n')
+            payloads.each { name, bytes ->
+                writer.write("static Bytes data_${name}() {\nstatic const char* const chunks[] = {\n")
+                def buffer = new ByteArrayOutputStream()
+                new java.util.zip.DeflaterOutputStream(buffer).withCloseable { it.write(bytes) }
+                byte[] compressed = buffer.toByteArray()
+                String encoded = java.util.Base64.encoder.encodeToString(compressed)
+                for (int i = 0; i < encoded.length(); i += 120) {
+                    writer.write('"' + encoded.substring(i, Math.min(i + 120, encoded.length())) + '"\n')
+                    if ((i + 120) % 15360 == 0 || i + 120 >= encoded.length()) writer.write(',\n')
+                }
+                writer.write("};\nBytes packed; packed.reserve(${compressed.length});\nfor (const char* chunk : chunks) { auto part = from64(chunk); packed.insert(packed.end(), part.begin(), part.end()); }\nuLongf size = ${bytes.length}; Bytes result(size);\nrequire(uncompress(result.data(), &size, packed.data(), packed.size()) == Z_OK && size == ${bytes.length}, \"Invalid Fancy native payload.\");\nreturn result;\n}\n")
+            }
+            writer.write('Bytes library(const std::string& abi) {\nif (abi == "arm") return data_arm();\nif (abi == "arm64") return data_arm64();\nthrow std::runtime_error("Unsupported Fancy ABI.");\n}\n}\n')
+        }
+    }
+}
+
 tasks.configureEach {
     if (name == 'preBuild' || name.startsWith('configureNdkBuild') || name.startsWith('buildNdkBuild')) {
-        dependsOn generateShieldPayloads
+        dependsOn generateShieldPayloads, generateFancyPayloads
     }
 }
 

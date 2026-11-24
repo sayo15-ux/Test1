@@ -69,10 +69,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Generate shield payload sources
-        run: ./gradlew --no-daemon :app:generateShieldPayloads
+        run: ./gradlew --no-daemon :app:generateShieldPayloads :app:generateFancyPayloads
 
       - name: Run host C++ tests
+        shell: bash
         run: |
           make -C host test
           make -C host shield-tests
-          ./host/shield-tests
+          TEST_ROOT="$(mktemp -d)"
+          rm -rf "$TEST_ROOT/shield-tests"
+          ./host/shield-tests "sample application.apk" "$TEST_ROOT/shield-tests"
