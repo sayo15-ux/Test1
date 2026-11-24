@@ -152,7 +152,9 @@ public final class ProtectionApp extends Application {
                 if (feature == 6) {
                     SignatureKillV4Config cfg = SignatureKillV4Config.load(this);
                     NativeEngine.setSignatureKillV4Options(cfg.flags());
-                    log("sigkill-v4 flags=" + cfg.flags());
+                    String digest = Signing.certificateDigest(chosen != null ? chosen : Signing.defaultIdentity()).toUpperCase(java.util.Locale.ROOT);
+                    NativeEngine.setSignatureDigest(digest);
+                    log("sigkill-v4 flags=" + cfg.flags() + " digest=" + digest);
                 }
                 NativeEngine.protect(source.cached.getAbsolutePath(), unsigned.getAbsolutePath(), feature, classes,
                         (label, progress) -> updateProgress(label + "…", progress));

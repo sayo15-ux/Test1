@@ -68,6 +68,8 @@ static std::mutex sigKillV3Mutex;
 static SignatureKillV3Options sigKillV3Options;
 static std::mutex sigKillV4Mutex;
 static SignatureKillV4Options sigKillV4Options;
+static std::mutex signatureDigestMutex;
+static std::string signatureDigest;
 
 extern "C" JNIEXPORT void JNICALL Java_io_dexpack_tool_NativeEngine_setSignatureKillV3Options(JNIEnv*env,jclass,jint flags,jstring redirection) {
     try {
@@ -87,6 +89,15 @@ extern "C" JNIEXPORT void JNICALL Java_io_dexpack_tool_NativeEngine_setSignature
     catch(const std::exception&e) {
         error(env,e);
     }
+}
+
+extern "C" JNIEXPORT void JNICALL Java_io_dexpack_tool_NativeEngine_setSignatureDigest(JNIEnv*env,jclass,jstring value) {
+    try {
+        std::lock_guard<std::mutex> lock(signatureDigestMutex);
+        signatureDigest = value ? env->GetStringUTFChars(value,nullptr) : std::string();
+        if (value) env->ReleaseStringUTFChars(value,signatureDigest.c_str());
+    }
+    catch(const std::exception&e) { error(env,e); }
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_dexpack_tool_NativeEngine_setSignatureKillV4Options(JNIEnv*env,jclass,jint flags) {
@@ -183,13 +194,18 @@ extern "C" JNIEXPORT jlongArray JNICALL Java_io_dexpack_tool_NativeEngine_protec
             v3 = sigKillV3Options;
         }
         SignatureKillV4Options v4;
+        std::string digest;
         {
             std::lock_guard<std::mutex> lock(sigKillV4Mutex);
             v4 = sigKillV4Options;
         }
+        {
+            std::lock_guard<std::mutex> lock(signatureDigestMutex);
+            digest = signatureDigest;
+        }
         auto report=dexpack::protect(input,destination,mode,names,[&](const std::string&label,int percent) {
             if(!listener)return;if(percent==previous&&label==last)return;previous=percent;last=label;auto s=toJava(env,utf16(label));require(s!=nullptr,"Cannot create progress message.");env->CallVoidMethod(listener,progress,s,jint(percent));env->DeleteLocalRef(s);require(!env->ExceptionCheck(),"Processing cancelled.");
-        }, {}, v3, v4);
+        }, {}, v3, v4, utf16(digest));
         jlong values[] {
             jlong(report.classes),jlong(report.literals),jlong(report.staticFields),jlong(report.uniqueStrings),jlong(report.classTables),jlong(report.methodsReframed),jlong(report.highRegisterSites),jlong(report.bridges)
         };

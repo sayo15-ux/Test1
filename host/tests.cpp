@@ -215,6 +215,32 @@ static void referenceTemplates() {
         expect(rejected,"Mixed V1/V2 context was accepted");
     }
 }
+static void signatureDigests() {
+    const Text before = u"B317FD151F2560E0B825C8A7CAFA519076E4799C13EC219FD2777BE866FD21CB";
+    const Text after = u"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    Model model;
+    Class cls;
+    cls.type = u"Ltest/Check;";
+    cls.flags = 0x1;
+    cls.super = u"Ljava/lang/Object;";
+    auto sig = method(u"Landroid/content/pm/Signature;", u"toByteArray", u"[B");
+    auto code = newCode({string(0, before), call(sig, 0, 0, 0x6e), raw({0x0e})}, 2);
+    cls.direct.push_back(newMethod(method(cls.type, u"check", u"V"), 0x9, code));
+    model.classes.push_back(cls);
+    patchSignatureDigests(model, after);
+    const auto out = read(write(model));
+    bool changed = false, legacy = false;
+    for (const auto& c : out.classes) for (const auto& m : c.direct) {
+        if (!m->code) continue;
+        for (const auto& i : m->code->instructions) {
+            if (!i.ref || i.ref->kind != Kind::String) continue;
+            changed |= i.ref->text == after;
+            legacy |= i.ref->text == before;
+        }
+    }
+    expect(changed, "Signature digest was not patched");
+    expect(!legacy, "Old signature digest remained");
+}
 static void signatureKiller() {
     Archive apk("../sample application.apk");
     SignatureOptions options;
@@ -261,8 +287,9 @@ int main() {
         sharedCodeAndMetadata();
         referenceTemplates();
         signatureKiller();
+        signatureDigests();
         nativeHelper();
-        std::cout << "8 native test groups passed\n";
+        std::cout << "9 native test groups passed\n";
         return 0;
     }
     catch (const std::exception& error) {

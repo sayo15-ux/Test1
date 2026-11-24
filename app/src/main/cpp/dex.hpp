@@ -109,6 +109,7 @@ namespace dexpack::dex {
     std::vector<Text> classNames(const Bytes& bytes);
     Bytes write(const Model& model);
     void rename(Model& model, const Text& before, const Text& after);
+    void patchSignatureDigests(Model& model, const Text& replacement);
     Instruction raw(std::initializer_list<uint16_t> units, Ref ref = {});
     Instruction constant(uint16_t reg, int32_t value);
     Instruction string(uint16_t reg, const Text& text);

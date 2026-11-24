@@ -758,4 +758,30 @@ namespace dexpack::dex {
             }
         }
     }
+    void patchSignatureDigests(Model& model, const Text& replacement) {
+        if (replacement.size() != 64) return;
+        auto hex = [](const Text& value) {
+            if (value.size() != 64) return false;
+            for (char32_t c : value) {
+                if (!((c >= U'0' && c <= U'9') || (c >= U'A' && c <= U'F'))) return false;
+            }
+            return true;
+        };
+        std::set<Text> targets;
+        for (const auto& c : model.classes) for (const auto& m : c.direct) {
+            if (!m->code) continue;
+            bool signature = false;
+            for (const auto& i : m->code->instructions) {
+                if (i.ref && i.ref->kind == Kind::Method &&
+                    (i.ref->owner == u"Landroid/content/pm/Signature;" ||
+                     (i.ref->owner == u"Ljava/security/MessageDigest;" && i.ref->text == u"digest"))) signature = true;
+            }
+            if (!signature) continue;
+            for (const auto& i : m->code->instructions) {
+                if (i.ref && i.ref->kind == Kind::String && hex(i.ref->text) && i.ref->text != replacement) targets.insert(i.ref->text);
+            }
+        }
+        for (const auto& target : targets) rename(model, target, replacement);
+    }
+
 }

@@ -16,6 +16,7 @@ public final class NativeEngine {
                                         String[] selected, Progress progress) throws IOException;
     public static native void setSignatureKillV3Options(int flags, String fileRedirection);
     public static native void setSignatureKillV4Options(int flags);
+    public static native void setSignatureDigest(String digest);
     public static native String[] archiveEntries(String path) throws IOException;
     public static native String[] dexSearch(String path, String query) throws IOException;
 }
