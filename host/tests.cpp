@@ -244,9 +244,9 @@ static void nativeHelper() {
     for (const auto& c : out.classes) for (const auto& m : c.direct) {
         if (!m->code) continue;
         for (const auto& i : m->code->instructions) {
-            if (!i.ref || i.ref->kind != Kind::String) continue;
-            target |= i.ref->text == after;
-            legacy |= i.ref->text == before;
+            if (!i.ref) continue;
+            target |= i.ref->text == after || i.ref->owner == after;
+            legacy |= i.ref->text == before || i.ref->owner == before;
         }
     }
     expect(target, "Target application class was not patched into native helper");
