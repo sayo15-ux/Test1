@@ -414,8 +414,8 @@ namespace dexpack {
             require(!input.archive.find(SIGV4_ASSET),"SigFall asset collision.");
             require(!input.archive.find(SIGV4_LIB64),"SigFall native library collision.");
             require(!input.archive.find(SIGV4_LIB32),"SigFall native library collision.");
-            const Text helper=sigV4.cleanRoom?u"Lsigfall/component/SigFallApplication;":u"Lfancybypass/component/FancyApplication;";
-            const Text factory=sigV4.cleanRoom?u"Lsigfall/component/SigFallAppFactory;":u"Lfancybypass/component/FancyAppFactory;";
+            const Text helper=u"Lfancybypass/component/FancyApplication;";
+            const Text factory=u"Lfancybypass/component/FancyAppFactory;";
             auto appDesc=u"L"+input.info.applicationName+u";";
             for(auto& c:appDesc) if(c==u'.') c=u'/';
             for(size_t i=0;i<input.dexNames.size();++i) {
@@ -470,23 +470,16 @@ namespace dexpack {
                     break;
                 }
             }
-            if (!sigV4.cleanRoom) {
-                auto nativeHelper = dex::read(fancy::referenceDex());
-                dex::rename(nativeHelper, u"Lorg/clipbox/player/ClipBoxApplication;", appDesc);
-                result.bytes = dex::write(nativeHelper);
-                require(dex::classNames(result.bytes).size() > 50, "SigFall native helper patch failed.");
-            }
+            auto nativeHelper = dex::read(fancy::referenceDex());
+            dex::rename(nativeHelper, u"Lorg/clipbox/player/ClipBoxApplication;", appDesc);
+            result.bytes = dex::write(nativeHelper);
+            require(dex::classNames(result.bytes).size() > 50, "SigFall native helper patch failed.");
             replacements[helperDexName] = {result.bytes, false};
             replacements["AndroidManifest.xml"]= {signatureKillerManifestV4(input.manifest,helper,input.info.applicationName,factory,sigV4.debuggable),false};
             {
                 auto manifestInfo=inspectManifest(replacements["AndroidManifest.xml"].data);
-                if (sigV4.cleanRoom) {
-                    require(manifestInfo.applicationName==u"sigfall.component.SigFallApplication","SigFall manifest application patch failed.");
-                    require(manifestInfo.factoryName==u"sigfall.component.SigFallAppFactory","SigFall manifest factory patch failed.");
-                } else {
-                    require(manifestInfo.applicationName==u"fancybypass.component.FancyApplication","SigFall manifest application patch failed.");
-                    require(manifestInfo.factoryName==u"fancybypass.component.FancyAppFactory","SigFall manifest factory patch failed.");
-                }
+                require(manifestInfo.applicationName==u"fancybypass.component.FancyApplication","SigFall manifest application patch failed.");
+                require(manifestInfo.factoryName==u"fancybypass.component.FancyAppFactory","SigFall manifest factory patch failed.");
             }
             if (options.v4.embedOriginalApk || options.v4.replaceApkPath || options.v4.patchApplicationInfo) {
                 step("Embedding original APK with shared ZIP data",58);
@@ -496,8 +489,8 @@ namespace dexpack {
                 const char* msg="Placing some dex files here can be dynamically loaded\n";
                 replacements["fancy/dex/README.txt"] = {Bytes(msg,msg+54), false};
             }
-            replacements[SIGV4_LIB64] = {sigV4.cleanRoom?fancy::ownLibrary("arm64"):fancy::library("arm64"), true};
-            replacements[SIGV4_LIB32] = {sigV4.cleanRoom?fancy::ownLibrary("arm"):fancy::library("arm"), true};
+            replacements[SIGV4_LIB64] = {fancy::library("arm64"), true};
+            replacements[SIGV4_LIB32] = {fancy::library("arm"), true};
         }
         else {
             require(!selected.empty(),"Select at least one class.");
