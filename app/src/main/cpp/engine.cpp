@@ -206,56 +206,77 @@ namespace dexpack {
             };
             report.classes=available.size();
         }
+        auto isPm=[](const dex::Ref& ref){
+            if(!ref||ref->kind!=dex::Kind::Method) return false;
+            auto n=ref->text, o=ref->owner;
+            bool pm=(o==u"Landroid/content/pm/PackageManager;"||o==u"Landroid/app/ApplicationPackageManager;");
+            return pm && (n==u"getPackageInfo"||n==u"getPackageArchiveInfo");
+        };
+        auto hookRef=[](const Text& helper,const dex::Ref& ref)->dex::Ref{
+            const Text PM=u"Landroid/content/pm/PackageManager;",PI=u"Landroid/content/pm/PackageInfo;",S=u"Ljava/lang/String;";
+            if(ref->text==u"getPackageArchiveInfo") return dex::method(helper,u"$getPackageArchiveInfo",PI,{PM,S,u"I"});
+            if(ref->proto && ref->proto->params.size()==2 && ref->proto->params[1]==u"Landroid/content/pm/PackageManager$PackageInfoFlags;")
+                return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"Landroid/content/pm/PackageManager$PackageInfoFlags;"});
+            return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"I"});
+        };
+        auto hasPmSigCall=[](const Bytes& data)->bool{
+            if(data.size()<112) return false;
+            auto u16=[&](size_t o)->uint32_t{ return o+2<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8):0u; };
+            auto u32=[&](size_t o)->uint32_t{ return o+4<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8)|(uint32_t(data[o+2])<<16)|(uint32_t(data[o+3])<<24):0u; };
+            uint32_t sc=u32(56), so=u32(60), tc=u32(64), to=u32(68), mc=u32(88), mo=u32(92);
+            if(uint64_t(so)+uint64_t(sc)*4>data.size()||uint64_t(to)+uint64_t(tc)*4>data.size()||uint64_t(mo)+uint64_t(mc)*8>data.size()) return true;
+            auto strEq=[&](uint32_t idx,const char* s,size_t n)->bool{
+                if(idx>=sc) return false;
+                size_t p=u32(so+idx*4); if(p>=data.size()) return false;
+                uint32_t len=0,shift=0;
+                for(int i=0;i<5&&p<data.size();++i){ uint8_t b=data[p++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
+                return len==n && p+n<=data.size() && std::memcmp(data.data()+p,s,n)==0;
+            };
+            std::vector<uint32_t> nameIdxs; nameIdxs.reserve(2);
+            for(uint32_t i=0;i<sc;++i){
+                size_t p=u32(so+i*4); if(p>=data.size()) continue;
+                uint32_t len=0,shift=0; size_t q=p;
+                for(int k=0;k<5&&q<data.size();++k){ uint8_t b=data[q++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
+                if((len==14 && q+14<=data.size() && std::memcmp(data.data()+q,"getPackageInfo",14)==0) ||
+                   (len==21 && q+21<=data.size() && std::memcmp(data.data()+q,"getPackageArchiveInfo",21)==0)) nameIdxs.push_back(i);
+            }
+            if(nameIdxs.empty()) return false;
+            std::vector<uint32_t> ownerIdxs; ownerIdxs.reserve(2);
+            for(uint32_t i=0;i<tc;++i){
+                uint32_t sidx=u32(to+i*4);
+                if(strEq(sidx,"Landroid/content/pm/PackageManager;",35) || strEq(sidx,"Landroid/app/ApplicationPackageManager;",39)) ownerIdxs.push_back(i);
+            }
+            if(ownerIdxs.empty()) return false;
+            for(uint32_t i=0;i<mc;++i){
+                size_t o=mo+i*8; uint32_t classIdx=u16(o), nameIdx=u32(o+4);
+                bool on=false,nn=false;
+                for(auto x:ownerIdxs) if(x==classIdx){on=true;break;}
+                if(!on) continue;
+                for(auto x:nameIdxs) if(x==nameIdx){nn=true;break;}
+                if(nn) return true;
+            }
+            return false;
+        };
+        auto rewritePmCalls=[&](dex::Model& model,const Text& helper,uint64_t& hits)->bool{
+            bool changed=false;
+            for(auto& cls:model.classes) {
+                for(auto* group:{&cls.direct,&cls.virtuals}) for(auto& m:*group) {
+                    if(!m->code) continue;
+                    for(auto& ins:m->code->instructions) {
+                        if(!ins.ref || !isPm(ins.ref)) continue;
+                        bool kind35=(ins.op>=0x6e&&ins.op<=0x72);
+                        bool kind3r=(ins.op>=0x74&&ins.op<=0x78);
+                        if(!kind35&&!kind3r) continue;
+                        ins.ref=hookRef(helper,ins.ref);
+                        ins.op=kind35?0x71:0x77;
+                        if(!ins.units.empty()) ins.units[0]=uint16_t((ins.units[0]&0xff00u)|ins.op);
+                        changed=true; hits++;
+                    }
+                }
+            }
+            return changed;
+        };
         auto patchPmCallSites = [&](const Text& helper) {
-            auto isPm=[&](const dex::Ref& ref){
-                if(!ref||ref->kind!=dex::Kind::Method) return false;
-                auto n=ref->text, o=ref->owner;
-                bool pm=(o==u"Landroid/content/pm/PackageManager;"||o==u"Landroid/app/ApplicationPackageManager;");
-                return pm && (n==u"getPackageInfo"||n==u"getPackageArchiveInfo");
-            };
-            auto hookRef=[&](const dex::Ref& ref)->dex::Ref{
-                const Text PM=u"Landroid/content/pm/PackageManager;",PI=u"Landroid/content/pm/PackageInfo;",S=u"Ljava/lang/String;";
-                if(ref->text==u"getPackageArchiveInfo") return dex::method(helper,u"$getPackageArchiveInfo",PI,{PM,S,u"I"});
-                if(ref->proto && ref->proto->params.size()==2 && ref->proto->params[1]==u"Landroid/content/pm/PackageManager$PackageInfoFlags;")
-                    return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"Landroid/content/pm/PackageManager$PackageInfoFlags;"});
-                return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"I"});
-            };
-            auto hasPmSigCall=[&](const Bytes& data)->bool{
-                if(data.size()<112) return false;
-                auto u16=[&](size_t o)->uint32_t{ return o+2<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8):0u; };
-                auto u32=[&](size_t o)->uint32_t{ return o+4<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8)|(uint32_t(data[o+2])<<16)|(uint32_t(data[o+3])<<24):0u; };
-                uint32_t sc=u32(56), so=u32(60), tc=u32(64), to=u32(68), mc=u32(88), mo=u32(92);
-                if(uint64_t(so)+uint64_t(sc)*4>data.size()||uint64_t(to)+uint64_t(tc)*4>data.size()||uint64_t(mo)+uint64_t(mc)*8>data.size()) return true;
-                auto strEq=[&](uint32_t idx,const char* s,size_t n)->bool{
-                    if(idx>=sc) return false;
-                    size_t p=u32(so+idx*4); if(p>=data.size()) return false;
-                    uint32_t len=0,shift=0;
-                    for(int i=0;i<5&&p<data.size();++i){ uint8_t b=data[p++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
-                    return len==n && p+n<=data.size() && std::memcmp(data.data()+p,s,n)==0;
-                };
-                std::vector<uint32_t> nameIdxs; nameIdxs.reserve(2);
-                for(uint32_t i=0;i<sc;++i){
-                    size_t p=u32(so+i*4); if(p>=data.size()) continue;
-                    uint32_t len=0,shift=0; size_t q=p;
-                    for(int k=0;k<5&&q<data.size();++k){ uint8_t b=data[q++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
-                    if((len==14 && q+14<=data.size() && std::memcmp(data.data()+q,"getPackageInfo",14)==0) ||
-                       (len==21 && q+21<=data.size() && std::memcmp(data.data()+q,"getPackageArchiveInfo",21)==0)) nameIdxs.push_back(i);
-                }
-                if(nameIdxs.empty()) return false;
-                std::vector<uint32_t> ownerIdxs; ownerIdxs.reserve(2);
-                for(uint32_t i=0;i<tc;++i){
-                    uint32_t sidx=u32(to+i*4);
-                    if(strEq(sidx,"Landroid/content/pm/PackageManager;",35) || strEq(sidx,"Landroid/app/ApplicationPackageManager;",39)) ownerIdxs.push_back(i);
-                }
-                if(ownerIdxs.empty()) return false;
-                for(uint32_t i=0;i<mc;++i){
-                    size_t o=mo+i*8; uint32_t classIdx=u16(o), nameIdx=u32(o+4);
-                    bool on=false,nn=false;
-                    for(auto x:ownerIdxs) if(x==classIdx){on=true;break;} if(!on) continue;
-                    for(auto x:nameIdxs) if(x==nameIdx){nn=true;break;} if(nn) return true;
-                }
-                return false;
-            };
             step("Prefiltering DEX for signature calls", 32);
             struct DexJob { size_t idx; std::string name; Bytes data; Bytes out; uint64_t hits=0; bool changed=false; std::string err; };
             std::vector<DexJob> jobs;
@@ -273,22 +294,8 @@ namespace dexpack {
                     auto& job=jobs[j];
                     try {
                         auto model=dex::read(job.data, true, false);
-                        bool changed=false; uint64_t hits=0;
-                        for(auto& cls:model.classes) {
-                            for(auto* group:{&cls.direct,&cls.virtuals}) for(auto& m:*group) {
-                                if(!m->code) continue;
-                                for(auto& ins:m->code->instructions) {
-                                    if(!ins.ref || !isPm(ins.ref)) continue;
-                                    bool kind35=(ins.op>=0x6e&&ins.op<=0x72);
-                                    bool kind3r=(ins.op>=0x74&&ins.op<=0x78);
-                                    if(!kind35&&!kind3r) continue;
-                                    ins.ref=hookRef(ins.ref);
-                                    ins.op=kind35?0x71:0x77;
-                                    if(!ins.units.empty()) ins.units[0]=uint16_t((ins.units[0]&0xff00u)|ins.op);
-                                    changed=true; hits++;
-                                }
-                            }
-                        }
+                        uint64_t hits=0;
+                        bool changed=rewritePmCalls(model,helper,hits);
                         if(changed) job.out=dex::write(model);
                         job.changed=changed; job.hits=hits;
                     } catch(const std::exception& e) { job.err=e.what(); }
@@ -296,7 +303,7 @@ namespace dexpack {
                     done.fetch_add(1);
                 }
             };
-            unsigned workers=std::min<unsigned>(4u, std::max<size_t>(1u, jobs.size()));
+            unsigned workers=std::min<unsigned>(8u, std::max<unsigned>(1u, std::thread::hardware_concurrency()));
             workers=std::min<unsigned>(workers, (unsigned)jobs.size());
             if(workers<=1) worker();
             else {
@@ -323,109 +330,7 @@ namespace dexpack {
             report.classes+=result.report.classes;
             report.literals+=result.report.methods;
             report.staticFields+=result.report.sites;
-            auto isPm=[&](const dex::Ref& ref){
-                if(!ref||ref->kind!=dex::Kind::Method) return false;
-                auto n=ref->text, o=ref->owner;
-                bool pm=(o==u"Landroid/content/pm/PackageManager;"||o==u"Landroid/app/ApplicationPackageManager;");
-                return pm && (n==u"getPackageInfo"||n==u"getPackageArchiveInfo");
-            };
-            auto hookRef=[&](const dex::Ref& ref)->dex::Ref{
-                const Text PM=u"Landroid/content/pm/PackageManager;",PI=u"Landroid/content/pm/PackageInfo;",S=u"Ljava/lang/String;";
-                if(ref->text==u"getPackageArchiveInfo") return dex::method(helper,u"$getPackageArchiveInfo",PI,{PM,S,u"I"});
-                if(ref->proto && ref->proto->params.size()==2 && ref->proto->params[1]==u"Landroid/content/pm/PackageManager$PackageInfoFlags;")
-                    return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"Landroid/content/pm/PackageManager$PackageInfoFlags;"});
-                return dex::method(helper,u"$getPackageInfo",PI,{PM,S,u"I"});
-            };
-            auto hasPmSigCall=[&](const Bytes& data)->bool{
-                if(data.size()<112) return false;
-                auto u16=[&](size_t o)->uint32_t{ return o+2<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8):0u; };
-                auto u32=[&](size_t o)->uint32_t{ return o+4<=data.size()?uint32_t(data[o])|(uint32_t(data[o+1])<<8)|(uint32_t(data[o+2])<<16)|(uint32_t(data[o+3])<<24):0u; };
-                uint32_t sc=u32(56), so=u32(60), tc=u32(64), to=u32(68), mc=u32(88), mo=u32(92);
-                if(uint64_t(so)+uint64_t(sc)*4>data.size()||uint64_t(to)+uint64_t(tc)*4>data.size()||uint64_t(mo)+uint64_t(mc)*8>data.size()) return true;
-                auto strEq=[&](uint32_t idx,const char* s,size_t n)->bool{
-                    if(idx>=sc) return false;
-                    size_t p=u32(so+idx*4); if(p>=data.size()) return false;
-                    uint32_t len=0,shift=0;
-                    for(int i=0;i<5&&p<data.size();++i){ uint8_t b=data[p++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
-                    return len==n && p+n<=data.size() && std::memcmp(data.data()+p,s,n)==0;
-                };
-                std::vector<uint32_t> nameIdxs; nameIdxs.reserve(2);
-                for(uint32_t i=0;i<sc;++i){
-                    size_t p=u32(so+i*4); if(p>=data.size()) continue;
-                    uint32_t len=0,shift=0; size_t q=p;
-                    for(int k=0;k<5&&q<data.size();++k){ uint8_t b=data[q++]; len|=uint32_t(b&0x7f)<<shift; if(!(b&0x80)) break; shift+=7; }
-                    if((len==14 && q+14<=data.size() && std::memcmp(data.data()+q,"getPackageInfo",14)==0) ||
-                       (len==21 && q+21<=data.size() && std::memcmp(data.data()+q,"getPackageArchiveInfo",21)==0)) nameIdxs.push_back(i);
-                }
-                if(nameIdxs.empty()) return false;
-                std::vector<uint32_t> ownerIdxs; ownerIdxs.reserve(2);
-                for(uint32_t i=0;i<tc;++i){
-                    uint32_t sidx=u32(to+i*4);
-                    if(strEq(sidx,"Landroid/content/pm/PackageManager;",35) || strEq(sidx,"Landroid/app/ApplicationPackageManager;",39)) ownerIdxs.push_back(i);
-                }
-                if(ownerIdxs.empty()) return false;
-                for(uint32_t i=0;i<mc;++i){
-                    size_t o=mo+i*8; uint32_t classIdx=u16(o), nameIdx=u32(o+4);
-                    bool on=false,nn=false;
-                    for(auto x:ownerIdxs) if(x==classIdx){on=true;break;} if(!on) continue;
-                    for(auto x:nameIdxs) if(x==nameIdx){nn=true;break;} if(nn) return true;
-                }
-                return false;
-            };
-            step("Prefiltering DEX for signature calls", 32);
-            struct DexJob { size_t idx; std::string name; Bytes data; Bytes out; uint64_t hits=0; bool changed=false; std::string err; };
-            std::vector<DexJob> jobs;
-            for(size_t i=0;i<input.dexNames.size();++i) {
-                const auto&name=input.dexNames[i];
-                step("Prefilter " + name, 32 + int(i * 18 / std::max<size_t>(1, input.dexNames.size())));
-                auto data=input.archive.extract(name);
-                if(hasPmSigCall(data)) jobs.push_back({i,name,std::move(data),{},0,false,{}});
-            }
-            step("Patching " + std::to_string(jobs.size()) + " candidate DEX", 52);
-            std::atomic<size_t> next{0}, done{0};
-            auto worker=[&](){
-                for(;;){
-                    size_t j=next.fetch_add(1);
-                    if(j>=jobs.size()) break;
-                    auto& job=jobs[j];
-                    try {
-                        auto model=dex::read(job.data, true, false);
-                        bool changed=false; uint64_t hits=0;
-                        for(auto& cls:model.classes) {
-                            for(auto* group:{&cls.direct,&cls.virtuals}) for(auto& m:*group) {
-                                if(!m->code) continue;
-                                for(auto& ins:m->code->instructions) {
-                                    if(!ins.ref || !isPm(ins.ref)) continue;
-                                    bool kind35=(ins.op>=0x6e&&ins.op<=0x72);
-                                    bool kind3r=(ins.op>=0x74&&ins.op<=0x78);
-                                    if(!kind35&&!kind3r) continue;
-                                    ins.ref=hookRef(ins.ref);
-                                    ins.op=kind35?0x71:0x77;
-                                    if(!ins.units.empty()) ins.units[0]=uint16_t((ins.units[0]&0xff00u)|ins.op);
-                                    changed=true; hits++;
-                                }
-                            }
-                        }
-                        if(changed) job.out=dex::write(model);
-                        job.changed=changed; job.hits=hits;
-                    } catch(const std::exception& e) { job.err=e.what(); }
-                    catch(...) { job.err="unknown error"; }
-                    done.fetch_add(1);
-                }
-            };
-            unsigned workers=std::min<unsigned>(4u, std::max<unsigned>(1u, std::thread::hardware_concurrency()));
-            workers=std::min<unsigned>(workers, (unsigned)jobs.size());
-            if(workers<=1) worker();
-            else {
-                std::vector<std::thread> ts;
-                for(unsigned t=0;t<workers;++t) ts.emplace_back(worker);
-                while(done.load()<jobs.size()) { std::this_thread::sleep_for(std::chrono::milliseconds(120)); step("Patching candidate DEX", 52 + int(done.load() * 28 / std::max<size_t>(1,jobs.size()))); }
-                for(auto& t:ts) t.join();
-            }
-            for(auto& job:jobs) {
-                if(!job.err.empty()) throw std::runtime_error(job.name + ": " + job.err);
-                if(job.changed) { replacements[job.name]={std::move(job.out),false}; report.uniqueStrings+=job.hits; }
-            }
+            patchPmCallSites(helper);
             step("Writing signature helper", 82);
             replacements["classes"+std::to_string(input.dexNames.size()+1)+".dex"]= {
                 std::move(result.bytes),false
@@ -519,9 +424,34 @@ namespace dexpack {
             const Text factory=sigV4.cleanRoom?u"Lsigfall/component/SigFallAppFactory;":u"Lfancybypass/component/FancyAppFactory;";
             auto appDesc=u"L"+input.info.applicationName+u";";
             for(auto& c:appDesc) if(c==u'.') c=u'/';
+            const std::set<std::string> lifecycle={"attachBaseContext","onCreate"};
             for(size_t i=0;i<input.dexNames.size();++i) {
                 const auto&name=input.dexNames[i];
                 auto data=input.archive.extract(name);
+                if(sigV4.cleanRoom && hasPmSigCall(data)) {
+                    auto model=dex::read(data,true,false);
+                    require(size_t(get32(data,96))==model.classes.size(),"Invalid DEX class table.");
+                    bool changed=false; uint64_t hits=0;
+                    for(auto& cls:model.classes) {
+                        if(cls.type!=appDesc) continue;
+                        if(cls.flags&0x10) { cls.flags&=~0x10u; changed=true; }
+                        bool found=false;
+                        for(auto* group:{&cls.direct,&cls.virtuals}) for(auto& m:*group) {
+                            if(m->ref && lifecycle.count(utf8(m->ref->text))) {
+                                found=true;
+                                m->flags&=~0x10u;
+                                changed=true;
+                            }
+                        }
+                        require(found,"Original application lifecycle methods not found.");
+                    }
+                    if(rewritePmCalls(model,helper,hits)) changed=true;
+                    if(changed) {
+                        replacements[name]={dex::write(model),false};
+                        report.uniqueStrings+=hits;
+                    }
+                    continue;
+                }
                 auto model=dex::read(data);
                 uint32_t classCount=get32(data,96);
                 uint32_t classDefs=get32(data,100);
@@ -536,7 +466,7 @@ namespace dexpack {
                         put32(data,off,get32(data,off)&~0x10u);
                         changed=true;
                     }
-                    patchFinalMethods(data,size_t(classDefs)+32*j,{"attachBaseContext","onCreate"});
+                    patchFinalMethods(data,size_t(classDefs)+32*j,lifecycle);
                     changed=true;
                 }
                 if(changed) {
@@ -581,7 +511,6 @@ namespace dexpack {
                 require(std::find(generated.begin(),generated.end(),helper)!=generated.end()
                         && std::find(generated.begin(),generated.end(),factory)!=generated.end(),
                         "Clean-room SigFall helper DEX is incomplete.");
-                patchPmCallSites(helper);
             }
             replacements[helperDexName] = {result.bytes, false};
             replacements["AndroidManifest.xml"]= {signatureKillerManifestV4(input.manifest,helper,input.info.applicationName,factory,sigV4.debuggable),false};
