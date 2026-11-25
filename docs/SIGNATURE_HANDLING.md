@@ -150,7 +150,26 @@ fallback can be blocked by Android
 `XSharedPreferences` path is primary. No Android 17 or HarmonyOS compatibility
 is claimed.
 
-## 5. Verification status
+## 5. Signature Kill v4 clean-room experiment
+
+Signature Kill v4 is native mode `6`. Its normal path injects the prebuilt
+`fancybypass.component.*` helper DEX and `libfancy-bypass.so` payloads.
+The opt-in **Clean-room DEX + native payload** flag (`signature_kill_v4`,
+bit `128`) instead uses the self-generated `sigfall.component.SigFallApplication`
+and `SigFallAppFactory` classes plus `libsigfall.so` built from `sigfall.cpp`.
+It forces embedding of the original APK and patching of APK path fields.
+
+The generated proxy installs a `PackageManager` proxy in `attachBaseContext`,
+hooks `getPackageInfo`/`getPackageArchiveInfo`/`generatePackageInfo`, extracts
+the original APK to `files/fancy/origin.apk`, and copies the native library to
+`files/libsigfall/<abi>.so`. The native layer exempts hidden APIs, patches GOT
+entries for file/map functions, filters `/proc/self/maps`, and redirects APK
+path reads to the extracted original. Only arm and arm64 payloads are provided.
+
+`patchSignatureDigests()` and the `setSignatureDigest` JNI method remain
+available but are not wired into v4; the clean-room flag does not use them.
+
+## 6. Verification status
 
 Build/test tooling (`java`, Gradle wrapper, C++ compiler) is not available in
 the environment where these changes were made, so compilation and on-device

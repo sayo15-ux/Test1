@@ -1372,41 +1372,45 @@ namespace dexpack {
 
         // $extractApk
         Builder ex;
-        ex.add(moveObject(0,8)); // v0 = ctx (ins=1, regs=9 -> v8)
+        ex.add(moveObject(0,11)); // v0 = ctx (ins=1, regs=12 -> v11)
         ex.add(field21(0x62,1,apkPathField)); // v1 = apkPath
         uint32_t exOk=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x39|(1<<8)),0})); // if-nez v1
         ex.add(raw({uint16_t(0x11|(1<<8)),0})); // return-object v1
         ex.instructions[exOk].target=uint32_t(ex.instructions.size());
-        ex.add(call(contextFiles,8,1,0x74)); ex.add(resultObject(1)); // v1 = filesDir
-        ex.add(string(2,u"origin.apk"));
+        ex.add(call(contextFiles,0,1,0x74)); ex.add(resultObject(1)); // v1 = filesDir
+        ex.add(string(2,u"fancy"));
         ex.add(typeOp(0x22,3,u"Ljava/io/File;")); ex.add(moveObject(4,1)); ex.add(moveObject(5,2));
-        ex.add(call(method(u"Ljava/io/File;",u"<init>",u"V",{u"Ljava/io/File;",STRING}),3,3,0x76)); // v3 = new File(v1,v2)
-        ex.add(call(fileExists,3,1,0x74)); ex.add(resultInt(1)); // v1 = exists
-        uint32_t needCopy=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x38|(1<<8)),0})); // if-eqz v1
-        ex.add(call(fileAbsolute,3,1,0x74)); ex.add(resultObject(1)); ex.add(field21(0x69,1,apkPathField)); ex.add(raw({uint16_t(0x11|(1<<8)),0}));
+        ex.add(call(fileParentInit,3,3,0x76)); // v3 = new File(filesDir,"fancy")
+        ex.add(call(fileMkdirs,3,1,0x74)); ex.add(resultInt(9));
+        ex.add(string(4,u"origin.apk"));
+        ex.add(typeOp(0x22,5,u"Ljava/io/File;")); ex.add(moveObject(6,3)); ex.add(moveObject(7,4));
+        ex.add(call(fileParentInit,5,3,0x76)); // v5 = new File(fancyDir,"origin.apk")
+        ex.add(call(fileExists,5,1,0x74)); ex.add(resultInt(9));
+        uint32_t needCopy=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x38|(9<<8)),0})); // if-eqz v9
+        ex.add(call(fileAbsolute,5,1,0x74)); ex.add(resultObject(9)); ex.add(field21(0x69,9,apkPathField)); ex.add(raw({uint16_t(0x11|(9<<8)),0}));
         ex.instructions[needCopy].target=uint32_t(ex.instructions.size());
         if (doEmbed) {
-            ex.add(call(contextAssets,8,1,0x74)); ex.add(resultObject(1)); // v1 = assets
-            ex.add(string(2,options.originalApkAsset));
-            ex.add(call(assetOpen,1,2,0x74)); ex.add(resultObject(4)); // v4 = inputStream
-            ex.add(typeOp(0x22,5,u"Ljava/io/FileOutputStream;")); ex.add(moveObject(6,3)); ex.add(call(outputInit,5,2,0x76)); // v5 = out(file v3)
-            ex.add(constant(6,4096)); ex.add(arrayOp(0x23,6,6,u"[B")); // v6 = buf
-            ex.add(constant(7,0)); // v7 = off
+            ex.add(call(contextAssets,0,1,0x74)); ex.add(resultObject(2)); // v2 = assets
+            ex.add(string(3,options.originalApkAsset));
+            ex.add(call(assetOpen,2,2,0x74)); ex.add(resultObject(4)); // v4 = inputStream
+            ex.add(typeOp(0x22,6,u"Ljava/io/FileOutputStream;")); ex.add(moveObject(7,5)); ex.add(call(outputInit,6,2,0x76)); // v6 = out(file v5)
+            ex.add(constant(7,4096)); ex.add(arrayOp(0x23,7,7,u"[B")); // v7 = buf
+            ex.add(constant(8,0)); // v8 = off
             uint32_t loop=uint32_t(ex.instructions.size());
-            ex.add(moveObject(0,4)); ex.add(moveObject(1,6)); ex.add(call(inputRead,0,2,0x74)); ex.add(resultInt(0)); // v0=read(v4,v6)
+            ex.add(moveObject(0,4)); ex.add(moveObject(1,7)); ex.add(call(inputRead,0,2,0x74)); ex.add(resultInt(0)); // v0=read(v4,v7)
             uint32_t done=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x3a|(0<<8)),0})); // if-gtz v0
-            Instruction w; w.op=0x6e; w.ref=outputWrite; w.units={uint16_t(0x6e|(4<<12)),0,uint16_t(5|(6<<4)|(7<<8)|(0<<12))}; w.oldPc=int64_t(ex.instructions.size()); ex.instructions.push_back(w); // write(v5,v6,v7,v0)
+            Instruction w; w.op=0x6e; w.ref=outputWrite; w.units={uint16_t(0x6e|(4<<12)),0,uint16_t(6|(7<<4)|(8<<8)|(0<<12))}; w.oldPc=int64_t(ex.instructions.size()); ex.instructions.push_back(w); // write(v6,v7,v8,v0)
             { uint32_t g=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x28),0})); ex.instructions[g].target=loop; ex.instructions[g].op=40; }
             ex.instructions[done].target=uint32_t(ex.instructions.size());
             ex.add(call(inputClose,4,1,0x74));
-            ex.add(call(outputClose,5,1,0x74));
-            ex.add(call(fileAbsolute,3,1,0x74)); ex.add(resultObject(1)); ex.add(field21(0x69,1,apkPathField));
-            ex.add(raw({uint16_t(0x11|(1<<8)),0}));
+            ex.add(call(outputClose,6,1,0x74));
+            ex.add(call(fileAbsolute,5,1,0x74)); ex.add(resultObject(9)); ex.add(field21(0x69,9,apkPathField));
+            ex.add(raw({uint16_t(0x11|(9<<8)),0}));
         } else {
-            ex.add(raw({uint16_t(0x12|(1<<8)),0})); ex.add(raw({uint16_t(0x11|(1<<8)),0}));
+            ex.add(raw({uint16_t(0x12|(9<<8)),0})); ex.add(raw({uint16_t(0x11|(9<<8)),0}));
         }
-        uint32_t exH=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x0d|(0<<8))})); ex.add(raw({uint16_t(0x12|(1<<8)),0})); ex.add(raw({uint16_t(0x11|(1<<8)),0}));
-        app.direct.push_back(newMethod(extractApk,0x8,ex.build(9,1,4,exH)));
+        uint32_t exH=uint32_t(ex.instructions.size()); ex.add(raw({uint16_t(0x0d|(0<<8))})); ex.add(raw({uint16_t(0x12|(0<<8)),0})); ex.add(raw({uint16_t(0x11|(0<<8)),0}));
+        app.direct.push_back(newMethod(extractApk,0x8,ex.build(12,1,5,exH)));
 
         // $loadNative
         Builder nat;
@@ -1414,42 +1418,42 @@ namespace dexpack {
         nat.add(string(1,u"arm64-v8a"));
         nat.add(call(stringEquals,0,2,0x74)); nat.add(resultInt(1));
         uint32_t natArm = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(1<<8)),0}));
-        nat.add(string(2,u"fancy/lib/arm64.so")); nat.add(string(3,u"arm64.so"));
+        nat.add(string(2,u"fancy/lib/arm64.so")); nat.add(string(3,u"libsigfall")); nat.add(string(4,u"arm64.so"));
         uint32_t natChooseEnd = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x28),0}));
         nat.instructions[natArm].target=uint32_t(nat.instructions.size());
-        nat.add(string(2,u"fancy/lib/arm.so")); nat.add(string(3,u"arm.so"));
+        nat.add(string(2,u"fancy/lib/arm.so")); nat.add(string(3,u"libsigfall")); nat.add(string(4,u"arm.so"));
         nat.instructions[natChooseEnd].target=uint32_t(nat.instructions.size());
-        nat.add(call(contextFiles,11,1,0x74)); nat.add(resultObject(4));
-        nat.add(typeOp(0x22,5,u"Ljava/io/File;")); nat.add(moveObject(6,4)); nat.add(moveObject(7,3));
-        nat.add(call(fileParentInit,5,3,0x76));
+        nat.add(call(contextFiles,11,1,0x74)); nat.add(resultObject(5)); // v5 = filesDir
         nat.add(typeOp(0x22,6,u"Ljava/io/File;")); nat.add(moveObject(7,5)); nat.add(moveObject(8,3));
-        nat.add(call(fileParentInit,6,3,0x76));
-        nat.add(call(fileExists,6,1,0x74)); nat.add(resultInt(7));
-        uint32_t natCopy = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(7<<8)),0}));
+        nat.add(call(fileParentInit,6,3,0x76)); // v6 = filesDir/libsigfall
+        nat.add(typeOp(0x22,7,u"Ljava/io/File;")); nat.add(moveObject(8,6)); nat.add(moveObject(9,4));
+        nat.add(call(fileParentInit,7,3,0x76)); // v7 = filesDir/libsigfall/<abi>.so
+        nat.add(call(fileExists,7,1,0x74)); nat.add(resultInt(8));
+        uint32_t natCopy = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(8<<8)),0}));
         uint32_t natSkip = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x28),0}));
         nat.instructions[natCopy].target=uint32_t(nat.instructions.size());
-        nat.add(call(fileParent,6,1,0x74)); nat.add(resultObject(7));
-        nat.add(call(fileMkdirs,7,1,0x74)); nat.add(resultInt(7));
-        nat.add(call(contextAssets,11,1,0x74)); nat.add(resultObject(7));
-        nat.add(moveObject(8,2)); nat.add(call(assetOpen,7,2,0x74)); nat.add(resultObject(8));
-        nat.add(typeOp(0x22,9,u"Ljava/io/FileOutputStream;")); nat.add(moveObject(10,6));
-        nat.add(call(outputInit,9,2,0x76));
-        nat.add(constant(7,4096)); nat.add(arrayOp(0x23,10,7,u"[B"));
-        nat.add(constant(7,0));
+        nat.add(call(fileParent,7,1,0x74)); nat.add(resultObject(8));
+        nat.add(call(fileMkdirs,8,1,0x74)); nat.add(resultInt(8));
+        nat.add(call(contextAssets,11,1,0x74)); nat.add(resultObject(8));
+        nat.add(moveObject(9,2)); nat.add(call(assetOpen,8,2,0x74)); nat.add(resultObject(2)); // v2 = inputStream
+        nat.add(typeOp(0x22,10,u"Ljava/io/FileOutputStream;")); nat.add(moveObject(8,7));
+        nat.add(call(outputInit,10,2,0x76)); // v10 = outputStream
+        nat.add(constant(0,4096)); nat.add(arrayOp(0x23,0,0,u"[B")); // v0 = buf
+        nat.add(constant(1,0)); // v1 = off
         uint32_t natLoop=uint32_t(nat.instructions.size());
-        nat.add(moveObject(0,8)); nat.add(moveObject(1,10));
-        nat.add(call(inputRead,0,2,0x74)); nat.add(resultInt(0));
-        uint32_t natDone=uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x3d|(0<<8)),0}));
-        Instruction nw; nw.op=0x6e; nw.ref=outputWrite; nw.units={uint16_t(0x6e|(4<<12)),0,uint16_t(9|(10<<4)|(7<<8)|(0<<12))}; nw.oldPc=int64_t(nat.instructions.size()); nat.instructions.push_back(nw);
+        nat.add(moveObject(8,2)); nat.add(moveObject(9,0));
+        nat.add(call(inputRead,8,2,0x74)); nat.add(resultInt(8));
+        uint32_t natDone=uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x3d|(8<<8)),0}));
+        Instruction nw; nw.op=0x6e; nw.ref=outputWrite; nw.units={uint16_t(0x6e|(4<<12)),0,uint16_t(10|(0<<4)|(1<<8)|(8<<12))}; nw.oldPc=int64_t(nat.instructions.size()); nat.instructions.push_back(nw);
         { uint32_t g=uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x28),0})); nat.instructions[g].target=natLoop; nat.instructions[g].op=40; }
         nat.instructions[natDone].target=uint32_t(nat.instructions.size());
-        nat.add(call(inputClose,8,1,0x74));
-        nat.add(call(outputClose,9,1,0x74));
+        nat.add(call(inputClose,2,1,0x74));
+        nat.add(call(outputClose,10,1,0x74));
         nat.instructions[natSkip].target=uint32_t(nat.instructions.size());
-        nat.add(call(fileAbsolute,6,1,0x74)); nat.add(resultObject(0));
+        nat.add(call(fileAbsolute,7,1,0x74)); nat.add(resultObject(0));
         nat.add(call(systemLoad,0,1,0x77));
         nat.add(raw({uint16_t(0x11|(0<<8)),0}));
-        uint32_t natH=uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x0d|(0<<8))}));
+        uint32_t natH=uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x0d|(0<<8)),0}));
         nat.add(raw({uint16_t(0x12|(0<<8)),0})); nat.add(raw({uint16_t(0x11|(0<<8)),0}));
         app.direct.push_back(newMethod(loadNative,0x8,nat.build(12,1,6,natH)));
 

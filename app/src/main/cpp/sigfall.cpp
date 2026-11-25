@@ -46,7 +46,10 @@ std::string processName() {
     long size = syscall(__NR_read, fd, buffer, sizeof(buffer) - 1);
     syscall(__NR_close, fd);
     if (size <= 0) return {};
-    return std::string(buffer, (size_t)strnlen(buffer, sizeof(buffer) - 1));
+    std::string name(buffer, (size_t)strnlen(buffer, sizeof(buffer) - 1));
+    size_t colon = name.find(':');
+    if (colon != std::string::npos) name.resize(colon);
+    return name;
 }
 
 std::string originApkPath() {

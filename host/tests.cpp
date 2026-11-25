@@ -278,6 +278,66 @@ static void nativeHelper() {
     expect(target, "Target application class was not patched into native helper");
     expect(!legacy, "ClipBox application class remained in native helper");
 }
+static void cleanRoomSignatureKiller() {
+    Archive apk("../sample application.apk");
+    SignatureOptions options;
+    options.className = u"Lsigfall/component/SigFallApplication;";
+    options.factoryName = u"Lsigfall/component/SigFallAppFactory;";
+    options.applicationName = u"com.example.Test";
+    options.packageName = u"com.example.test";
+    options.originalApkAsset = u"fancy/origin.apk";
+    options.v4.cleanRoom = true;
+    options.v4.embedOriginalApk = true;
+    options.v4.replaceApkPath = true;
+    options.v4.patchApplicationInfo = true;
+    auto result = killSignaturesV4(apk, options);
+    expect(result.changed, "Clean-room signature killer made no changes");
+    expect(result.report.classes == 3, "Unexpected clean-room helper class count");
+    validateDex(result.bytes);
+    auto classes = classNames(result.bytes);
+    bool application = false, factory = false;
+    for (const auto& name : classes) {
+        application |= name == options.className;
+        factory |= name == options.factoryName;
+    }
+    expect(application && factory, "Clean-room proxy classes are missing");
+    for (const char* abi : {"arm", "arm64"}) {
+        auto library = fancy::ownLibrary(abi);
+        expect(library.size() > 1024, "Clean-room native payload is missing");
+        expect(library[0] == 0x7f && library[1] == 'E' && library[2] == 'L' && library[3] == 'F',
+               "Clean-room native payload is not an ELF library");
+    }
+    Input input("../sample application.apk");
+    const std::string output = "/tmp/opencode/clean-room-v4.apk";
+    SignatureKillV4Options config;
+    config.cleanRoom = true;
+    auto report = protect(input, output, 6, {}, {}, {}, {}, config);
+    expect(report.classes == 3, "Clean-room protect used the wrong helper");
+    Archive packed(output);
+    expect(packed.find("fancy/origin.apk"), "Clean-room original APK asset is missing");
+    expect(packed.find("fancy/lib/arm64.so") && packed.find("fancy/lib/arm.so"),
+           "Clean-room native libraries are missing");
+    auto manifest = inspectManifest(packed.extract("AndroidManifest.xml"));
+    expect(manifest.applicationName == u"sigfall.component.SigFallApplication"
+           && manifest.factoryName == u"sigfall.component.SigFallAppFactory",
+           "Clean-room manifest was not rewritten");
+    bool clean = false, legacy = false;
+    for (const auto& entry : packed.entries) {
+        if (!dexEntry(entry.name)) continue;
+        for (const auto& name : classNames(packed.extract(entry.name))) {
+            clean |= name == u"Lsigfall/component/SigFallApplication;";
+            legacy |= name == u"Lfancybypass/component/FancyApplication;";
+        }
+    }
+    expect(clean && !legacy, "Clean-room helper DEX was not used");
+    const std::string standardOutput = "/tmp/opencode/standard-v4.apk";
+    protect(input, standardOutput, 6, {}, {}, {}, {}, SignatureKillV4Options{});
+    Archive standard(standardOutput);
+    auto standardManifest = inspectManifest(standard.extract("AndroidManifest.xml"));
+    expect(standardManifest.applicationName == u"fancybypass.component.FancyApplication"
+           && standardManifest.factoryName == u"fancybypass.component.FancyAppFactory",
+           "Standard v4 manifest was not rewritten");
+}
 int main() {
     try {
         crypto();
@@ -289,7 +349,8 @@ int main() {
         signatureKiller();
         signatureDigests();
         nativeHelper();
-        std::cout << "9 native test groups passed\n";
+        cleanRoomSignatureKiller();
+        std::cout << "10 native test groups passed\n";
         return 0;
     }
     catch (const std::exception& error) {
