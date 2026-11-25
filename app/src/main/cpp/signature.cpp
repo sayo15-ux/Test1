@@ -1446,7 +1446,7 @@ namespace dexpack {
         nat.add(call(contextAssets,11,1,0x74)); nat.add(resultObject(8));
         nat.add(moveObject(9,2)); nat.add(call(assetOpen,8,2,0x74)); nat.add(resultObject(2)); // v2 = inputStream
         nat.add(typeOp(0x22,10,u"Ljava/io/FileOutputStream;")); nat.add(moveObject(8,7));
-        nat.add(raw({uint16_t(0x76|(2<<8)),0,uint16_t(10|(8<<4))},outputInit)); // v10 = outputStream
+        nat.add(raw({uint16_t(0x70|(2<<8)),0,uint16_t(10|(8<<4))},outputInit)); // v10 = outputStream
         nat.add(constant(0,4096)); nat.add(arrayOp(0x23,0,0,u"[B")); // v0 = buf
         nat.add(constant(1,0)); // v1 = off
         uint32_t natLoop=uint32_t(nat.instructions.size());
