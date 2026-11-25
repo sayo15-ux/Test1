@@ -411,9 +411,6 @@ namespace dexpack {
             static const std::string SIGV4_ASSET="fancy/origin.apk";
             static const std::string SIGV4_LIB64="fancy/lib/arm64.so";
             static const std::string SIGV4_LIB32="fancy/lib/arm.so";
-            require(!input.archive.find(SIGV4_ASSET),"SigFall asset collision.");
-            require(!input.archive.find(SIGV4_LIB64),"SigFall native library collision.");
-            require(!input.archive.find(SIGV4_LIB32),"SigFall native library collision.");
             const Text helper=sigV4.cleanRoom?u"Lsigfall/component/SigFallApplication;":u"Lfancybypass/component/FancyApplication;";
             const Text factory=sigV4.cleanRoom?u"Lsigfall/component/SigFallAppFactory;":u"Lfancybypass/component/FancyAppFactory;";
             auto appDesc=u"L"+input.info.applicationName+u";";

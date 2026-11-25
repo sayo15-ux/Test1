@@ -1177,6 +1177,8 @@ namespace dexpack {
         Text originalApp = u"L" + options.applicationName;
         for (auto& c : originalApp) if (c == u'.') c = u'/';
         originalApp += u";";
+        Text helperName = proxy.substr(1, proxy.size() - 2);
+        for (auto& c : helperName) if (c == u'/') c = u'.';
 
         Ref certField = field(proxy, u"certificate", u"[B");
         Ref originalField = field(proxy, u"original", OBJECT);
@@ -1417,12 +1419,19 @@ namespace dexpack {
         nat.add(field21(0x62,0,cpuAbi)); // v0 = Build.CPU_ABI
         nat.add(string(1,u"arm64-v8a"));
         nat.add(call(stringEquals,0,2,0x74)); nat.add(resultInt(1));
-        uint32_t natArm = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(1<<8)),0}));
+        uint32_t natArm64 = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(1<<8)),0}));
         nat.add(string(2,u"fancy/lib/arm64.so")); nat.add(string(3,u"libsigfall")); nat.add(string(4,u"arm64.so"));
         uint32_t natChooseEnd = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x28),0}));
-        nat.instructions[natArm].target=uint32_t(nat.instructions.size());
+        nat.instructions[natArm64].target=uint32_t(nat.instructions.size());
+        nat.add(string(1,u"armeabi-v7a"));
+        nat.add(call(stringEquals,0,2,0x74)); nat.add(resultInt(1));
+        uint32_t natArm = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x38|(1<<8)),0}));
         nat.add(string(2,u"fancy/lib/arm.so")); nat.add(string(3,u"libsigfall")); nat.add(string(4,u"arm.so"));
         nat.instructions[natChooseEnd].target=uint32_t(nat.instructions.size());
+        uint32_t natUnsupportedSkip = uint32_t(nat.instructions.size()); nat.add(raw({uint16_t(0x28),0}));
+        nat.instructions[natArm].target=uint32_t(nat.instructions.size());
+        nat.add(raw({uint16_t(0x12|(0<<8)),0})); nat.add(raw({uint16_t(0x11|(0<<8)),0}));
+        nat.instructions[natUnsupportedSkip].target=uint32_t(nat.instructions.size());
         nat.add(call(contextFiles,11,1,0x74)); nat.add(resultObject(5)); // v5 = filesDir
         nat.add(typeOp(0x22,6,u"Ljava/io/File;")); nat.add(moveObject(7,5)); nat.add(moveObject(8,3));
         nat.add(call(fileParentInit,6,3,0x76)); // v6 = filesDir/libsigfall
@@ -1437,7 +1446,7 @@ namespace dexpack {
         nat.add(call(contextAssets,11,1,0x74)); nat.add(resultObject(8));
         nat.add(moveObject(9,2)); nat.add(call(assetOpen,8,2,0x74)); nat.add(resultObject(2)); // v2 = inputStream
         nat.add(typeOp(0x22,10,u"Ljava/io/FileOutputStream;")); nat.add(moveObject(8,7));
-        nat.add(call(outputInit,10,2,0x76)); // v10 = outputStream
+        nat.add(raw({uint16_t(0x76|(2<<8)),0,uint16_t(10|(8<<4))},outputInit)); // v10 = outputStream
         nat.add(constant(0,4096)); nat.add(arrayOp(0x23,0,0,u"[B")); // v0 = buf
         nat.add(constant(1,0)); // v1 = off
         uint32_t natLoop=uint32_t(nat.instructions.size());
@@ -1530,7 +1539,7 @@ namespace dexpack {
         // instantiateApplication
         Builder ia;
         // ins=3: this=v3, cl=v4, className=v5
-        ia.add(string(0,u"fancybypass.component.FancyApplication"));
+        ia.add(string(0,helperName));
         ia.add(moveObject(1,5));
         ia.add(call(stringEquals,0,2,0x74)); ia.add(resultInt(0));
         uint32_t notProxy=uint32_t(ia.instructions.size()); ia.add(raw({uint16_t(0x38|(0<<8)),0}));
