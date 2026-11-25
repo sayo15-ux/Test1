@@ -320,8 +320,10 @@ static void cleanRoomSignatureKiller() {
             if (method->ref->text == u"$loadNative") {
                 for (const auto& ins : method->code->instructions) {
                     if (ins.ref && ins.ref->owner == u"Ljava/io/FileOutputStream;" && ins.ref->text == u"<init>") {
-                        expect(ins.op == 0x70 && ins.units.size() == 3 && ins.units[2] == uint16_t(10 | (8 << 4)),
-                               "Clean-room native copy passes the wrong File register");
+                        expect(ins.op == 0x70 && ins.units.size() == 3
+                               && ins.units[0] == uint16_t(0x70 | (2 << 12))
+                               && ins.units[2] == uint16_t(10 | (8 << 4)),
+                               "Clean-room native copy has an invalid FileOutputStream invoke");
                         outputStreamChecked = true;
                     }
                     if (ins.ref && ins.ref->kind == Kind::String && ins.ref->text == u"armeabi-v7a") abiFallbackChecked = true;
