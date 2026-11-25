@@ -109,10 +109,32 @@ namespace dexpack {
         }
     }
     std::vector<Text> classes(const Input&input) {
+        std::vector<std::vector<Text>> groups(input.dexNames.size());
+        std::vector<std::string> errors(input.dexNames.size());
+        std::atomic<size_t> next{0};
+        auto worker=[&](){
+            for(;;) {
+                size_t i=next.fetch_add(1);
+                if(i>=input.dexNames.size()) break;
+                try {
+                    auto data=input.archive.extract(input.dexNames[i]);
+                    groups[i]=dex::classNames(data);
+                } catch(const std::exception& e) { errors[i]=e.what(); }
+                catch(...) { errors[i]="unknown error"; }
+            }
+        };
+        unsigned workers=std::min<unsigned>(8u,std::max<unsigned>(1u,std::thread::hardware_concurrency()));
+        workers=std::min<size_t>(workers,input.dexNames.size());
+        if(workers<=1) worker();
+        else {
+            std::vector<std::thread> ts;
+            for(unsigned i=0;i<workers;++i) ts.emplace_back(worker);
+            for(auto&t:ts)t.join();
+        }
         std::set<Text>seen;
-        for(const auto&name:input.dexNames) {
-            auto data=input.archive.extract(name);
-            for(const auto&t:dex::classNames(data)) {
+        for(size_t i=0;i<input.dexNames.size();++i) {
+            if(!errors[i].empty()) throw std::runtime_error(input.dexNames[i]+": "+errors[i]);
+            for(const auto&t:groups[i]) {
                 require(seen.insert(t).second,"This APK defines a class twice.");
                 require(t.rfind(u"Lcn/beingyi/fallen/shield1/",0)!=0,"This APK already contains a shield loader.");
             }

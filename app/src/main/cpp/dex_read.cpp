@@ -632,13 +632,32 @@ namespace dexpack::dex {
         return p.parse();
     }
     std::vector<Text> classNames(const Bytes& bytes) {
-        Parser p(bytes);
-        Reader r(bytes,p.tables[5].off);
-        std::vector<Text>names;
-        for(uint32_t i=0;i<p.tables[5].n;++i) {
-            names.push_back(p.at(Kind::Type,r.u32())->text);
-            r.need(28);
-            r.p+=28;
+        validateDex(bytes);
+        Reader h(bytes,56);
+        uint32_t stringCount=h.u32(), stringOff=h.u32();
+        uint32_t typeCount=h.u32(), typeOff=h.u32();
+        Reader cd(bytes,96);
+        uint32_t classCount=cd.u32(), classOff=cd.u32();
+        require(!stringCount||(stringOff>=112&&stringOff%4==0&&uint64_t(stringOff)+uint64_t(stringCount)*4<=bytes.size()),"Invalid DEX string table.");
+        require(!typeCount||(typeOff>=112&&typeOff%4==0&&uint64_t(typeOff)+uint64_t(typeCount)*4<=bytes.size()),"Invalid DEX type table.");
+        require(!classCount||(classOff>=112&&classOff%4==0&&uint64_t(classOff)+uint64_t(classCount)*32<=bytes.size()),"Invalid DEX class table.");
+        std::vector<uint32_t> strings(stringCount),types(typeCount);
+        Reader sr(bytes,stringOff);
+        for(auto&v:strings)v=sr.u32();
+        Reader tr(bytes,typeOff);
+        for(auto&v:types)v=tr.u32();
+        std::vector<Text> names;
+        names.reserve(classCount);
+        Reader cr(bytes,classOff);
+        for(uint32_t i=0;i<classCount;++i) {
+            cr.need(32);
+            uint32_t typeIdx=cr.u32();
+            cr.p+=28;
+            require(typeIdx<typeCount,"Invalid DEX class type index.");
+            uint32_t stringIdx=types[typeIdx];
+            require(stringIdx<stringCount,"Invalid DEX class name index.");
+            Reader name(bytes,strings[stringIdx]);
+            names.push_back(mutfRead(name));
         }
         return names;
     }
