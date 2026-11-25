@@ -354,6 +354,19 @@ static void cleanRoomSignatureKiller() {
     expect(report.classes == 3, "Clean-room protect used the wrong helper");
     expect(report.uniqueStrings > 0, "Clean-room did not rewrite any PackageManager signature calls");
     Archive packed(output);
+    Text appType = u"L";
+    for (char16_t c : input.info.applicationName) appType += c == u'.' ? u'/' : c;
+    appType += u";";
+    bool finalCleared = false;
+    for (const auto& entry : packed.entries) {
+        if (!dexEntry(entry.name)) continue;
+        for (const auto& cls : dex::read(packed.extract(entry.name)).classes) {
+            if (cls.type != appType) continue;
+            expect(!(cls.flags & 0x10), "Clean-room kept the original application final");
+            finalCleared = true;
+        }
+    }
+    expect(finalCleared, "Clean-room output is missing the original application class");
     expect(packed.find("fancy/origin.apk"), "Clean-room original APK asset is missing");
     expect(packed.find("fancy/lib/arm64.so") && packed.find("fancy/lib/arm.so"),
            "Clean-room native libraries are missing");

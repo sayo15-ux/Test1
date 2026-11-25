@@ -261,7 +261,7 @@ namespace dexpack {
             std::vector<DexJob> jobs;
             for(size_t i=0;i<input.dexNames.size();++i) {
                 const auto&name=input.dexNames[i];
-                auto data=input.archive.extract(name);
+                auto data=replacements.count(name)?replacements[name].data:input.archive.extract(name);
                 if(hasPmSigCall(data)) jobs.push_back({i,name,std::move(data),{},0,false,{}});
             }
             step("Patching " + std::to_string(jobs.size()) + " candidate DEX", 52);
