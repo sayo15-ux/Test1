@@ -1168,6 +1168,8 @@ namespace dexpack {
         if (progress) progress("Building Fancy-style proxy", 40);
         const Text OBJECT_CLASS = u"Ljava/lang/Class;";
         const Text STRING = u"Ljava/lang/String;";
+        const Text PM = u"Landroid/content/pm/PackageManager;";
+        const Text PI_FLAGS = u"Landroid/content/pm/PackageManager$PackageInfoFlags;";
         const Text CONTEXT = u"Landroid/content/Context;";
         const Text LOADER = u"Ljava/lang/ClassLoader;";
         const Text METHOD = u"Ljava/lang/reflect/Method;";
@@ -1184,6 +1186,7 @@ namespace dexpack {
         Ref originalField = field(proxy, u"original", OBJECT);
         Ref originalAppField = field(proxy, u"originalApp", APPLICATION);
         Ref apkPathField = field(proxy, u"originalApkPath", STRING);
+        Ref pkgNameField = field(PACKAGE_INFO, u"packageName", STRING);
         Ref originalAppNameField = field(proxy, u"originalAppName", STRING);
         Ref signaturesField = field(PACKAGE_INFO, u"signatures", SIGNATURE_ARRAY);
         Ref signingInfoField = field(PACKAGE_INFO, u"signingInfo", u"Landroid/content/pm/SigningInfo;");
@@ -1232,6 +1235,10 @@ namespace dexpack {
         Ref logI = method(u"Landroid/util/Log;", u"i", u"I", {STRING, STRING});
         Ref logE = method(u"Landroid/util/Log;", u"e", u"I", {STRING, STRING, u"Ljava/lang/Throwable;"});
         Ref logMethod = method(proxy, u"$log", u"V", {STRING});
+        Ref patchNamed = method(proxy, u"$patchPackageInfo", PACKAGE_INFO, {PACKAGE_INFO, STRING});
+        Ref hookGetPkgInt = method(proxy, u"$getPackageInfo", PACKAGE_INFO, {PM, STRING, u"I"});
+        Ref hookGetPkgFlags = method(proxy, u"$getPackageInfo", PACKAGE_INFO, {PM, STRING, PI_FLAGS});
+        Ref hookGetArchive = method(proxy, u"$getPackageArchiveInfo", PACKAGE_INFO, {PM, STRING, u"I"});
 
         Ref appInit = method(proxy, u"<init>", u"V");
         Ref appClinit = method(proxy, u"<clinit>", u"V");
@@ -1339,6 +1346,57 @@ namespace dexpack {
         }
         patchCode.add(raw({0x0e}));
         app.direct.push_back(newMethod(patchPackage,0x8,patchCode.build(4,1,3)));
+
+        // $patchPackageInfo(PackageInfo pi, String targetPkg)
+        Builder namedCode;
+        namedCode.add(moveObject(0,3));
+        uint32_t namedNull = uint32_t(namedCode.instructions.size()); namedCode.branch(0x38,0,0);
+        namedCode.add(moveObject(1,4));
+        uint32_t namedAny = uint32_t(namedCode.instructions.size()); namedCode.branch(0x38,1,0);
+        namedCode.add(field22(0x54,0,3,pkgNameField));
+        namedCode.add(moveObject(1,4));
+        namedCode.add(call(stringEquals,0,2,0x74)); namedCode.add(resultInt(0));
+        uint32_t namedMismatch = uint32_t(namedCode.instructions.size()); namedCode.branch(0x38,0,0);
+        uint32_t namedDo = uint32_t(namedCode.instructions.size());
+        namedCode.add(moveObject(0,3)); namedCode.add(call(patchPackage,0,1,0x77));
+        uint32_t namedRet = uint32_t(namedCode.instructions.size());
+        namedCode.add(raw({uint16_t(0x11|(3<<8)),0}));
+        namedCode.instructions[namedNull].target = namedRet;
+        namedCode.instructions[namedAny].target = namedDo;
+        namedCode.instructions[namedMismatch].target = namedRet;
+        app.direct.push_back(newMethod(patchNamed,0x9,namedCode.build(5,2,3)));
+
+        auto makeStaticPmHook = [&](const Ref& hook, const Text& flagsType, bool flagsObject) {
+            Builder b;
+            b.add(moveObject(0,4)); b.add(moveObject(1,5));
+            b.add(flagsObject ? moveObject(2,6) : moveInt(2,6));
+            Instruction inv; inv.op = 0x6e; inv.ref = method(PM, u"getPackageInfo", PACKAGE_INFO, {STRING, flagsType});
+            inv.units = {uint16_t(0x6e|(3<<12)), 0, uint16_t(0|(1<<4)|(2<<8))};
+            inv.oldPc = int64_t(b.instructions.size()); b.instructions.push_back(inv);
+            b.add(raw({uint16_t(0x0c|(0<<8)),0}));
+            b.add(moveObject(1,5));
+            b.add(call(patchNamed,0,2,0x77)); b.add(resultObject(0));
+            b.add(raw({uint16_t(0x11|(0<<8)),0}));
+            uint32_t h = uint32_t(b.instructions.size());
+            b.add(raw({uint16_t(0x0d|(0<<8))})); b.add(constant(0,0)); b.add(raw({uint16_t(0x11|(0<<8)),0}));
+            app.direct.push_back(newMethod(hook,0x9,b.build(7,3,3,h)));
+        };
+        makeStaticPmHook(hookGetPkgInt,u"I",false);
+        makeStaticPmHook(hookGetPkgFlags,PI_FLAGS,true);
+        {
+            Builder b;
+            b.add(moveObject(0,4)); b.add(moveObject(1,5)); b.add(moveInt(2,6));
+            Instruction inv; inv.op = 0x6e; inv.ref = method(PM, u"getPackageArchiveInfo", PACKAGE_INFO, {STRING, u"I"});
+            inv.units = {uint16_t(0x6e|(3<<12)), 0, uint16_t(0|(1<<4)|(2<<8))};
+            inv.oldPc = int64_t(b.instructions.size()); b.instructions.push_back(inv);
+            b.add(raw({uint16_t(0x0c|(0<<8)),0}));
+            b.add(constant(1,0));
+            b.add(call(patchNamed,0,2,0x77)); b.add(resultObject(0));
+            b.add(raw({uint16_t(0x11|(0<<8)),0}));
+            uint32_t h = uint32_t(b.instructions.size());
+            b.add(raw({uint16_t(0x0d|(0<<8))})); b.add(constant(0,0)); b.add(raw({uint16_t(0x11|(0<<8)),0}));
+            app.direct.push_back(newMethod(hookGetArchive,0x9,b.build(7,3,3,h)));
+        }
 
         // $install PM proxy
         Builder installCode;

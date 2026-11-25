@@ -164,9 +164,13 @@ hooks `getPackageInfo`/`getPackageArchiveInfo`/`generatePackageInfo`, extracts
 the original APK to `files/fancy/origin.apk`, and copies the native library to
 `files/libsigfall/<abi>.so`. The native layer exempts hidden APIs, patches GOT
 entries for file/map functions, filters `/proc/self/maps`, and redirects APK
-path reads to the extracted original. Only arm and arm64 payloads are provided;
-on other ABIs the native copy/load is skipped. Existing `fancy/origin.apk` or
-`fancy/lib/*.so` entries in an input APK are overwritten by the injected copies.
+path reads to the extracted original. It also rewrites application DEX call
+sites for `PackageManager.getPackageInfo` and `getPackageArchiveInfo` to the
+generated `$getPackageInfo`/`$getPackageArchiveInfo` helpers, using the same
+call-site patching approach as Signature Kill v1. Only arm and arm64 payloads
+are provided; on other ABIs the native copy/load is skipped. Existing
+`fancy/origin.apk` or `fancy/lib/*.so` entries in an input APK are overwritten
+by the injected copies.
 
 `patchSignatureDigests()` and the `setSignatureDigest` JNI method remain
 available but are not wired into v4; the clean-room flag does not use them.
