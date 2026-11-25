@@ -195,8 +195,13 @@ namespace dexpack {
             if(progress)progress(s,n);
         };
         step("Analyzing APK",5);
-        auto available=classes(input);
-        std::set<Text>names(available.begin(),available.end());
+        std::set<Text>names;
+        size_t availableCount=0;
+        if(mode!=6) {
+            auto available=classes(input);
+            availableCount=available.size();
+            names.insert(available.begin(),available.end());
+        }
         std::map<std::string,Replacement>replacements;
         std::set<std::string>remove;
         StringReport report;
@@ -226,7 +231,7 @@ namespace dexpack {
             if(resources&&resources->method!=0)replacements[resources->name]= {
                 input.archive.extract(*resources),true
             };
-            report.classes=available.size();
+            report.classes=availableCount;
         }
         auto isPm=[](const dex::Ref& ref){
             if(!ref||ref->kind!=dex::Kind::Method) return false;
